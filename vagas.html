@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vagas Abertas - Effore Recrutamento e Seleção</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="nav-logo">
+                    <img src="assets/effore-recrutamento.png" alt="Effore Recrutamento e Seleção Logo">
+                </a>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="para-empresa.html" class="nav-link">Para Empresa</a></li>
+                    <li><a href="vagas.html" class="nav-link active">Vagas</a></li>
+                    <li><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="contato.html" class="nav-link btn btn-outline">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Encontre sua Próxima Oportunidade</h1>
+                <p class="page-subtitle">Conectamos você ao seu futuro profissional. Veja nossas vagas.</p>
+            </div>
+        </section>
+
+        <section id="processo-candidato" class="process fade-in-section" style="padding-top: 80px; background-color: var(--color-bg-light);">
+            <div class="container">
+                <h2 class="section-title">Como funciona nosso processo</h2>
+                <p class="section-subtitle">Na Effore, valorizamos seu tempo. Nosso processo é transparente e focado em você.</p>
+                <div class="process-grid">
+                    <div class="process-step">
+                        <span class="process-number">01</span>
+                        <h4>Candidatura</h4>
+                        <p>Você se aplica à vaga ou envia seu currículo para nosso banco de talentos.</p>
+                    </div>
+                    <div class="process-step">
+                        <span class="process-number">02</span>
+                        <h4>Análise e Triagem</h4>
+                        <p>Nossa equipe de especialistas analisa seu perfil. **Nosso prazo médio para o primeiro retorno (positivo ou não) é de 5 dias úteis.**</p>
+                    </div>
+                    <div class="process-step">
+                        <span class="process-number">03</span>
+                        <h4>Entrevistas</h4>
+                        <p>Etapas de entrevistas com nossos recrutadores e, em seguida, com a empresa contratante.</p>
+                    </div>
+                    <div class="process-step">
+                        <span class="process-number">04</span>
+                        <h4>Proposta e Contratação</h4>
+                        <p>Recebimento da proposta e início da sua nova jornada profissional. Parabéns!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="vagas-abertas" class="jobs-page-section fade-in-section">
+            <div class="container">
+                <div class="job-filters">
+                    <input type="text" placeholder="Cargo ou palavra-chave..." class="filter-input">
+                    <select class="filter-select">
+                        <option value="">Localização</option>
+                        <option value="remoto">Remoto</option>
+                        <option value="hibrido">Híbrido</option>
+                        <option value="presencial">Presencial</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">Tipo de Contrato</option>
+                        <option value="clt">CLT</option>
+                        <option value="pj">PJ</option>
+                        <option value="estagio">Estágio</option>
+                    </select>
+                    <button class="btn btn-primary">Buscar</button>
+                </div>
+                <div class="jobs-list">
+                    <div class="job-card">
+                        <div class="job-info">
+                            <h3 class="job-title">Desenvolvedor(a) Backend Python Sênior</h3>
+                            <span class="job-location">Remoto (Brasil) • CLT</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Ver Detalhes</a>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-info">
+                            <h3 class="job-title">Gerente de Projetos (Metodologia Ágil)</h3>
+                            <span class="job-location">Híbrido - São Paulo, SP • PJ</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Ver Detalhes</a>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-info">
+                            <h3 class="job-title">Especialista em Business Intelligence (BI)</h3>
+                            <span class="job-location">Presencial - Campinas, SP • CLT</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Ver Detalhes</a>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-info">
+                            <h3 class="job-title">Analista de Marketing Digital (SEO/SEM)</h3>
+                            <span class="job-location">Remoto • PJ</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Ver Detalhes</a>
+                    </div>
+                    <div class="job-card">
+                        <div class="job-info">
+                            <h3 class="job-title">Designer de Produto (UX/UI) Pleno</h3>
+                            <span class="job-location">Híbrido - Rio de Janeiro, RJ • CLT</span>
+                        </div>
+                        <a href="#" class="btn btn-outline">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="talent-pool" class="talent-pool fade-in-section">
+            <div class="container">
+                <div class="talent-pool-content">
+                    <div class="talent-text">
+                        <h2>Não encontrou a vaga ideal?</h2>
+                        <p>Deixe seu currículo conosco. Você fará parte do nosso banco de talentos e será a primeira pessoa a saber quando surgir uma oportunidade alinhada ao seu perfil.</p>
+                    </div>
+                    <form class="talent-form">
+                        <div class="form-group-inline">
+                            <input type="text" placeholder="Seu Nome" required>
+                            <input type="email" placeholder="Seu Email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cv-upload">Anexe seu currículo (PDF ou DOCX)</label>
+                            <input type="file" id="cv-upload" accept=".pdf,.doc,.docx" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Enviar Currículo</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="contato-candidato" class="contact fade-in-section">
+            <div class="container">
+                <h2 class="section-title">Dúvidas sobre o Processo?</h2>
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h3>Fale Conosco</h3>
+                        <p>Tem alguma pergunta sobre uma vaga específica ou sobre como funciona nossa seleção? Envie-nos uma mensagem.</p>
+                        <p><strong>Atenção:</strong> Não aceitamos currículos por este formulário. Por favor, use a seção de vagas ou o banco de talentos.</p>
+                    </div>
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <label for="name">Nome</label>
+                            <input type_text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Assunto (Vaga de Interesse)</label>
+                            <input type="text" id="subject" name="subject">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Sua Dúvida</label>
+                            <textarea id="message" name="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar Dúvida</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Effore Recrutamento e Seleção. Todos os direitos reservados.</p>
+                <div class="footer-social">
+                    <a href="#">LinkedIn</a>
+                    <a href="#">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="efeitos.js" defer></script>
+</body>
+</html>
