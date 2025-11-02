@@ -1,7 +1,10 @@
 // Dentro do arquivo efeitos.js
 
 document.addEventListener("DOMContentLoaded", function() {
-            
+    // Ativa o fade global do body
+    requestAnimationFrame(() => document.body.classList.add('is-loaded'));
+    
+    // Menu Mobile Toggle
     const menuToggle = document.getElementById('mobile-menu-toggle');
     const navMenu = document.querySelector('.nav-menu');
 
@@ -15,20 +18,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 1. Seleciona todos os elementos que queremos animar
+    // Animação fade-in de seções ao rolar
     const sectionsToAnimate = document.querySelectorAll('.fade-in-section');
 
-    if (!sectionsToAnimate.length) return;
+    if (sectionsToAnimate.length === 0) return;
 
-    // 2. Cria o "Observador"
+    // Cria o "Observador"
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-            // 3. Se o elemento está na tela (isIntersecting)
+            // Se o elemento está na tela (isIntersecting)
             if (entry.isIntersecting) {
-                // 4. Adiciona a classe .is-visible
+                // Adiciona a classe .is-visible
                 entry.target.classList.add('is-visible');
                 
-                // 5. Para de observar este elemento (para a animação não repetir)
+                // Para de observar este elemento (para a animação não repetir)
                 observer.unobserve(entry.target);
             }
         });
@@ -36,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
         threshold: 0.1 // A animação começa quando 10% do elemento estiver visível
     });
 
-    // 6. Diz ao observador para "observar" cada seção
+    // Diz ao observador para "observar" cada seção
     sectionsToAnimate.forEach(section => {
         observer.observe(section);
     });

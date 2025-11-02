@@ -85,6 +85,8 @@ body::before {
 .nav-logo {
     padding: 0;
     margin: 0;
+    position: relative;
+    z-index: 1002; /* Fica acima de tudo (menu é 999, botão é 1001) */
 }
 
 .nav-logo img {
@@ -466,33 +468,6 @@ body::before {
 /* 7. RESPONSIVIDADE (PARA CELULARES) */
 /* (Seu código original) */
 @media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
-
-    .services-grid {
-        /* Muda de 3 colunas para 1 coluna */
-        grid-template-columns: 1fr;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-
-    /* Ajustes no menu para mobile (simples) */
-    /* Para um menu "hambúrguer" completo, seria necessário JavaScript */
-    .nav-menu {
-        flex-direction: column;
-        gap: 10px;
-        width: 100%;
-        display: none; /* Esconde o menu por padrão (requer JS para mostrar) */
-    }
-
-    .navbar {
-        align-items: center;
-    }
 
     /* --- RESPONSIVIDADE DAS NOVAS SEÇÕES --- */
 
@@ -1063,22 +1038,20 @@ body::before {
     border: none;
     cursor: pointer;
     padding: 0;
-    /* O z-index do header é 1000. 
-      O botão precisa estar visível, então usamos 1001. 
-    */
-    z-index: 1001;
+    position: relative;
+    z-index: 1001; /* Fica na frente do header (1000) */
 }
 
 .mobile-menu-button .bar {
     display: block;
     width: 100%;
-    height: 3px; /* Espessura da barra */
-    background-color: var(--color-orange); /* A cor laranja! */
+    height: 3px;
+    background-color: var(--color-orange);
     border-radius: 2px;
     transition: all 0.3s ease-in-out;
 }
 
-/* Animação do "Hambúrguer" para "X" */
+/* Animação para "X" */
 .mobile-menu-button.is-active .bar:nth-child(1) {
     transform: translateY(8.5px) rotate(45deg);
 }
@@ -1089,57 +1062,110 @@ body::before {
     transform: translateY(-8.5px) rotate(-45deg);
 }
 
-
 /* --- Media Query para o Menu Mobile --- */
 @media (max-width: 768px) {
     
+    /* Mostra o botão hambúrguer */
     .mobile-menu-button {
-        display: flex; /* Mostra o botão hambúrguer no mobile */
+        display: flex;
     }
 
-    /* * MODIFICAÇÃO PRINCIPAL:
-     * O menu agora é posicionado FORA da tela (acima)
-     * e desliza para baixo quando 'is-active' é adicionado.
-     */
+    /* Garante que a navbar fique na horizontal (logo à esquerda, botão à direita) */
+    .navbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Estilo do Menu Mobile */
     .nav-menu {
-        display: flex; /* Começa como flex para a transição funcionar */
+        display: flex; 
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start; /* Começa a preencher de cima para baixo */
+        justify-content: flex-start;
         gap: 30px;
-        padding-top: 30px; /* Um espaço no topo do menu */
+        padding: 30px 0;
         
         position: fixed;
-        /* z-index 999 (abaixo do header que é 1000) */
-        z-index: 999; 
+        z-index: 999; /* Fica ATRÁS do header (1000) e do logo (1002) */
         
-        /* * Começa no topo de 110px (altura do seu header: 80px logo + 30px padding) 
-         *
-         */
-        top: 110px;   
+        /* Posição logo abaixo do header */
+        top: 110px; /* Altura aproximada do header */
         left: 0;
         width: 100%;
-        height: calc(100vh - 110px); /* Altura do menu = 100% da tela - altura do header */
+        max-height: calc(100vh - 110px); /* Não ultrapassa a altura da tela */
+        overflow-y: auto; /* Adiciona scroll se necessário */
 
         background-color: var(--color-white);
-        border-top: 1px solid #eee; /* Linha divisória */
+        border-top: 2px solid var(--color-orange);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         
-        /* Animação: começa escondido (acima do seu 'top' de 110px) */
-        transform: translateY(-100%);
-        transition: transform 0.4s ease-in-out;
+        /* Começa invisível (opacidade 0 e deslocado para cima) */
+        opacity: 0;
+        transform: translateY(-20px);
+        pointer-events: none; /* Impede cliques quando invisível */
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
     }
 
-    /* Quando o menu está ATIVO (clicado) */
+    /* Quando o menu está ATIVO */
     .nav-menu.is-active {
-        transform: translateY(0); /* Desliza para a posição 0 (visível) */
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto; /* Permite cliques quando visível */
     }
 
-    /* Ajusta os links dentro do menu mobile */
+    /* Links do menu mobile maiores e mais espaçados */
     .nav-menu .nav-link {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+        padding: 10px 0;
     }
-
+    
     .nav-menu .btn-outline {
         font-size: 1.2rem;
+        padding: 12px 30px;
+    }
+
+    /* --- REGRAS DE RESPONSIVIDADE ANTIGAS --- */
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .about-image {
+        order: -1;
+    }
+    
+    .job-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .job-card .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+        padding: 25px;
     }
 }
