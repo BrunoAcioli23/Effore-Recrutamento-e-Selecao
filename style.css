@@ -491,8 +491,7 @@ body::before {
     }
 
     .navbar {
-        flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
     }
 
     /* --- RESPONSIVIDADE DAS NOVAS SEÇÕES --- */
@@ -1049,5 +1048,98 @@ body::before {
     .news-image {
         width: 100%; /* Imagem ocupa 100% da largura */
         height: 200px; /* Altura maior no celular */
+    }
+}
+
+/* --- 25. ESTILOS DO MENU MOBILE (SLIDE-DOWN) --- */
+
+.mobile-menu-button {
+    display: none; /* Escondido no desktop */
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    /* O z-index do header é 1000. 
+      O botão precisa estar visível, então usamos 1001. 
+    */
+    z-index: 1001;
+}
+
+.mobile-menu-button .bar {
+    display: block;
+    width: 100%;
+    height: 3px; /* Espessura da barra */
+    background-color: var(--color-orange); /* A cor laranja! */
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Animação do "Hambúrguer" para "X" */
+.mobile-menu-button.is-active .bar:nth-child(1) {
+    transform: translateY(8.5px) rotate(45deg);
+}
+.mobile-menu-button.is-active .bar:nth-child(2) {
+    opacity: 0;
+}
+.mobile-menu-button.is-active .bar:nth-child(3) {
+    transform: translateY(-8.5px) rotate(-45deg);
+}
+
+
+/* --- Media Query para o Menu Mobile --- */
+@media (max-width: 768px) {
+    
+    .mobile-menu-button {
+        display: flex; /* Mostra o botão hambúrguer no mobile */
+    }
+
+    /* * MODIFICAÇÃO PRINCIPAL:
+     * O menu agora é posicionado FORA da tela (acima)
+     * e desliza para baixo quando 'is-active' é adicionado.
+     */
+    .nav-menu {
+        display: flex; /* Começa como flex para a transição funcionar */
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start; /* Começa a preencher de cima para baixo */
+        gap: 30px;
+        padding-top: 30px; /* Um espaço no topo do menu */
+        
+        position: fixed;
+        /* z-index 999 (abaixo do header que é 1000) */
+        z-index: 999; 
+        
+        /* * Começa no topo de 110px (altura do seu header: 80px logo + 30px padding) 
+         *
+         */
+        top: 110px;   
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 110px); /* Altura do menu = 100% da tela - altura do header */
+
+        background-color: var(--color-white);
+        border-top: 1px solid #eee; /* Linha divisória */
+        
+        /* Animação: começa escondido (acima do seu 'top' de 110px) */
+        transform: translateY(-100%);
+        transition: transform 0.4s ease-in-out;
+    }
+
+    /* Quando o menu está ATIVO (clicado) */
+    .nav-menu.is-active {
+        transform: translateY(0); /* Desliza para a posição 0 (visível) */
+    }
+
+    /* Ajusta os links dentro do menu mobile */
+    .nav-menu .nav-link {
+        font-size: 1.5rem;
+    }
+
+    .nav-menu .btn-outline {
+        font-size: 1.2rem;
     }
 }

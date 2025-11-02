@@ -2,6 +2,19 @@
 
 document.addEventListener("DOMContentLoaded", function() {
             
+    const menuToggle = document.getElementById('mobile-menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', function() {
+            // Alterna a classe 'is-active' no botão (para virar "X")
+            menuToggle.classList.toggle('is-active');
+            
+            // Alterna a classe 'is-active' no menu (para aparecer)
+            navMenu.classList.toggle('is-active');
+        });
+    }
+
     // 1. Seleciona todos os elementos que queremos animar
     const sectionsToAnimate = document.querySelectorAll('.fade-in-section');
 
