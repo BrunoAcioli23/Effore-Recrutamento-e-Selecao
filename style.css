@@ -440,6 +440,22 @@ body::before {
     line-height: 2;
 }
 
+.contact-info a {
+    text-decoration: none;
+    color: inherit; /* evita o azul padrão */
+    -webkit-tap-highlight-color: transparent; /* remove o brilho azul em mobile */
+    outline: none;
+    transition: color 0.2s ease;
+}
+
+.contact-info a:visited,
+.contact-info a:focus,
+.contact-info a:active {
+    color: inherit;
+    outline: none;
+    box-shadow: none;
+}
+
 .contact-form .form-group {
     margin-bottom: 20px;
 }
