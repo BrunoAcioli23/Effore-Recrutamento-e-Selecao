@@ -1,4 +1,4 @@
-// Sistema de gerenciamento de vagas usando Firebase Firestore
+// Sistema de gerenciamento de vagas - Novo Design
 
 class VagasManager {
     constructor() {
@@ -12,7 +12,7 @@ class VagasManager {
         this.configurarEventos();
         await this.carregarVagas();
         
-        // Listener em tempo real para mudanças no Firestore (sem orderBy)
+        // Listener em tempo real para mudanças no Firestore
         this.vagasCollection.onSnapshot((snapshot) => {
             this.vagas = [];
             snapshot.forEach((doc) => {
@@ -21,55 +21,40 @@ class VagasManager {
                     ...doc.data()
                 });
             });
-            // Ordenar no client-side por data de criação (mais recentes primeiro)
+            // Ordenar no client-side por data de criação
             this.vagas.sort((a, b) => {
                 if (a.criadoEm && b.criadoEm) {
                     return b.criadoEm.toDate() - a.criadoEm.toDate();
                 }
                 return 0;
             });
-            this.renderizarVagas();
+            this.renderizarTudo();
         });
     }
 
     configurarEventos() {
-        const btnNovaVaga = document.getElementById('btn-nova-vaga');
-        const modal = document.getElementById('modal-vaga');
-        const btnCancelar = document.getElementById('btn-cancelar');
-        const modalClose = document.querySelector('.modal-close');
-        const formVaga = document.getElementById('form-vaga');
+        const btnSalvar = document.getElementById('btn-salvar');
+        const searchInput = document.getElementById('search-input');
 
-        // Abrir modal para nova vaga
-        btnNovaVaga.addEventListener('click', () => {
-            this.abrirModal();
+        // Evento de salvar vaga
+        btnSalvar.addEventListener('click', () => {
+            this.salvarVaga();
         });
 
-        // Fechar modal
-        btnCancelar.addEventListener('click', () => {
-            this.fecharModal();
-        });
-
-        modalClose.addEventListener('click', () => {
-            this.fecharModal();
-        });
-
-        // Fechar modal ao clicar fora
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                this.fecharModal();
-            }
-        });
-
-        // Submit do formulário
-        formVaga.addEventListener('submit', (e) => {
+        // Prevenir submit do form
+        document.getElementById('form-vaga').addEventListener('submit', (e) => {
             e.preventDefault();
             this.salvarVaga();
+        });
+
+        // Busca em tempo real
+        searchInput.addEventListener('input', (e) => {
+            this.filtrarVagas(e.target.value);
         });
     }
 
     async carregarVagas() {
         try {
-            // Buscar todas as vagas (sem orderBy)
             const snapshot = await this.vagasCollection.get();
             this.vagas = [];
             snapshot.forEach((doc) => {
@@ -85,17 +70,15 @@ class VagasManager {
                 }
                 return 0;
             });
-            this.renderizarVagas();
+            this.renderizarTudo();
         } catch (error) {
             console.error('Erro ao carregar vagas:', error);
-            alert('Erro ao carregar vagas. Verifique sua conexão.');
         }
     }
 
     async salvarNoFirestore(vaga, isUpdate = false) {
         try {
             if (isUpdate) {
-                // Atualizar vaga existente
                 await this.vagasCollection.doc(vaga.id).update({
                     titulo: vaga.titulo,
                     localizacao: vaga.localizacao,
@@ -105,7 +88,6 @@ class VagasManager {
                     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } else {
-                // Adicionar nova vaga
                 await this.vagasCollection.add({
                     titulo: vaga.titulo,
                     localizacao: vaga.localizacao,
@@ -123,41 +105,11 @@ class VagasManager {
         }
     }
 
-    adicionarVagasExemplo() {
-        // Removido - agora as vagas só são adicionadas manualmente
-    }
-
-    renderizarVagas() {
-        const listaElement = document.getElementById('vagas-lista');
-        
-        // Atualizar métricas do dashboard
+    renderizarTudo() {
         this.atualizarMetricas();
-        
-        if (this.vagas.length === 0) {
-            listaElement.innerHTML = `
-                <div class="empty-state">
-                    <p>Nenhuma vaga cadastrada ainda.</p>
-                    <button class="btn btn-primary" onclick="vagasManager.abrirModal()">Cadastrar Primeira Vaga</button>
-                </div>
-            `;
-            return;
-        }
-
-        listaElement.innerHTML = this.vagas.map(vaga => `
-            <div class="admin-vaga-card">
-                <div class="admin-vaga-info">
-                    <h3>${vaga.titulo}</h3>
-                    <p>${vaga.localizacao} • ${vaga.contrato}</p>
-                </div>
-                <div class="admin-vaga-actions">
-                    <button class="btn-editar" data-vaga-id="${vaga.id}">Editar</button>
-                    <button class="btn-excluir" data-vaga-id="${vaga.id}">Excluir</button>
-                </div>
-            </div>
-        `).join('');
-
-        // Adicionar event listeners após renderizar
-        this.adicionarEventListenersVagas();
+        this.renderizarGrafico();
+        this.renderizarDistribuicao();
+        this.renderizarTabela();
     }
 
     atualizarMetricas() {
@@ -185,47 +137,47 @@ class VagasManager {
         }).length;
         document.getElementById('vagas-este-mes').textContent = vagasEsteMes;
 
-        // Estatísticas por tipo de contrato
-        this.renderizarEstatisticasContrato();
-
-        // Estatísticas por localização
-        this.renderizarEstatisticasLocalizacao();
+        // Atualizar badge no menu
+        document.getElementById('vagas-count').textContent = totalVagas;
     }
 
-    renderizarEstatisticasContrato() {
-        const contratos = {
-            'CLT': 0,
-            'PJ': 0,
-            'Estágio': 0
-        };
-
-        this.vagas.forEach(vaga => {
-            const contrato = vaga.contrato.toUpperCase();
-            if (contratos.hasOwnProperty(contrato)) {
-                contratos[contrato]++;
-            } else if (contrato === 'ESTAGIO') {
-                contratos['Estágio']++;
-            }
-        });
-
-        const total = this.vagas.length || 1;
-        const statsContratoElement = document.getElementById('stats-contrato');
+    renderizarGrafico() {
+        const chartContainer = document.getElementById('vagas-periodo-chart');
         
-        statsContratoElement.innerHTML = Object.entries(contratos).map(([tipo, count]) => {
-            const porcentagem = Math.round((count / total) * 100);
+        // Últimos 7 dias
+        const hoje = new Date();
+        const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const dados = [];
+
+        for (let i = 6; i >= 0; i--) {
+            const data = new Date(hoje);
+            data.setDate(data.getDate() - i);
+            const dia = diasSemana[data.getDay()];
+            
+            const vagasNoDia = this.vagas.filter(v => {
+                if (!v.criadoEm) return false;
+                const dataCriacao = v.criadoEm.toDate();
+                return dataCriacao.toDateString() === data.toDateString();
+            }).length;
+
+            dados.push({ dia, count: vagasNoDia });
+        }
+
+        const maxValue = Math.max(...dados.map(d => d.count), 1);
+
+        chartContainer.innerHTML = dados.map(d => {
+            const altura = (d.count / maxValue) * 100;
             return `
-                <div class="stats-item">
-                    <span class="stats-label">${tipo}</span>
-                    <div class="stats-bar">
-                        <div class="stats-bar-fill" style="width: ${porcentagem}%; background: #667eea;"></div>
-                    </div>
-                    <span class="stats-value">${count}</span>
+                <div class="bar-item">
+                    <div class="bar-value">${d.count}</div>
+                    <div class="bar" style="height: ${altura}%"></div>
+                    <div class="bar-label">${d.dia}</div>
                 </div>
             `;
         }).join('');
     }
 
-    renderizarEstatisticasLocalizacao() {
+    renderizarDistribuicao() {
         const localizacoes = {
             'Remoto': 0,
             'Híbrido': 0,
@@ -240,76 +192,149 @@ class VagasManager {
         });
 
         const total = this.vagas.length || 1;
+        const container = document.getElementById('distribuicao-localizacao');
+        
+        // Cores laranja para cada tipo
         const cores = {
-            'Remoto': '#4facfe',
-            'Híbrido': '#f093fb',
-            'Presencial': '#fa709a'
+            'Remoto': 'linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%)',
+            'Híbrido': 'linear-gradient(135deg, #ff8c42 0%, #ffb347 100%)',
+            'Presencial': 'linear-gradient(135deg, #ffb347 0%, #ffd166 100%)'
         };
         
-        const statsLocalizacaoElement = document.getElementById('stats-localizacao');
-        
-        statsLocalizacaoElement.innerHTML = Object.entries(localizacoes).map(([tipo, count]) => {
+        container.innerHTML = Object.entries(localizacoes).map(([tipo, count]) => {
             const porcentagem = Math.round((count / total) * 100);
             return `
-                <div class="stats-item">
-                    <span class="stats-label">${tipo}</span>
-                    <div class="stats-bar">
-                        <div class="stats-bar-fill" style="width: ${porcentagem}%; background: ${cores[tipo]};"></div>
+                <div class="distribution-item">
+                    <div class="distribution-header">
+                        <span class="distribution-label">${tipo}</span>
+                        <span class="distribution-value">${count} (${porcentagem}%)</span>
                     </div>
-                    <span class="stats-value">${count}</span>
+                    <div class="distribution-bar">
+                        <div class="distribution-fill" style="width: ${porcentagem}%; background: ${cores[tipo]}"></div>
+                    </div>
                 </div>
             `;
         }).join('');
     }
 
-    adicionarEventListenersVagas() {
-        // Event listeners para botões de editar
-        document.querySelectorAll('.btn-editar').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const vagaId = e.target.getAttribute('data-vaga-id');
-                this.editarVaga(vagaId);
-            });
-        });
-
-        // Event listeners para botões de excluir
-        document.querySelectorAll('.btn-excluir').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const vagaId = e.target.getAttribute('data-vaga-id');
-                this.excluirVaga(vagaId);
-            });
-        });
-    }
-
-    abrirModal(vaga = null) {
-        const modal = document.getElementById('modal-vaga');
-        const modalTitulo = document.getElementById('modal-titulo');
+    renderizarTabela(vagasFiltradas = null) {
+        const vagas = vagasFiltradas || this.vagas;
+        const container = document.getElementById('vagas-table-container');
         
-        if (vaga) {
-            // Modo edição
-            modalTitulo.textContent = 'Editar Vaga';
-            document.getElementById('vaga-id').value = vaga.id;
-            document.getElementById('vaga-titulo').value = vaga.titulo;
-            document.getElementById('vaga-localizacao').value = vaga.localizacao;
-            document.getElementById('vaga-tipo-local').value = vaga.tipoLocal;
-            document.getElementById('vaga-contrato').value = vaga.contrato;
-            document.getElementById('vaga-descricao').value = vaga.descricao || '';
-            this.vagaEditandoId = vaga.id;
-        } else {
-            // Modo criação
-            modalTitulo.textContent = 'Nova Vaga';
-            document.getElementById('form-vaga').reset();
-            document.getElementById('vaga-id').value = '';
-            this.vagaEditandoId = null;
+        if (vagas.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3 class="empty-title">Nenhuma vaga encontrada</h3>
+                    <p class="empty-text">Comece criando sua primeira vaga de emprego</p>
+                    <button class="btn-primary" onclick="document.getElementById('btn-nova-vaga').click()">
+                        <i class="fas fa-plus"></i>
+                        Nova Vaga
+                    </button>
+                </div>
+            `;
+            return;
         }
-        
-        modal.style.display = 'block';
+
+        container.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>TÍTULO</th>
+                        <th>LOCALIZAÇÃO</th>
+                        <th>TIPO</th>
+                        <th>CONTRATO</th>
+                        <th>STATUS</th>
+                        <th>CRIADA EM</th>
+                        <th>AÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${vagas.map(vaga => `
+                        <tr>
+                            <td><strong>${vaga.titulo}</strong></td>
+                            <td>${vaga.localizacao}</td>
+                            <td><span class="type-badge ${vaga.tipoLocal}">${this.formatarTipo(vaga.tipoLocal)}</span></td>
+                            <td>${this.formatarContrato(vaga.contrato)}</td>
+                            <td><span class="status-badge ${vaga.ativa !== false ? 'active' : 'inactive'}">${vaga.ativa !== false ? 'Ativa' : 'Inativa'}</span></td>
+                            <td>${this.formatarData(vaga.criadoEm)}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-edit" data-id="${vaga.id}" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-action btn-delete" data-id="${vaga.id}" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        // Adicionar event listeners
+        container.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                this.editarVaga(id);
+            });
+        });
+
+        container.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                this.excluirVaga(id);
+            });
+        });
     }
 
-    fecharModal() {
-        const modal = document.getElementById('modal-vaga');
-        modal.style.display = 'none';
-        document.getElementById('form-vaga').reset();
-        this.vagaEditandoId = null;
+    filtrarVagas(termo) {
+        if (!termo.trim()) {
+            this.renderizarTabela();
+            return;
+        }
+
+        const termoLower = termo.toLowerCase();
+        const vagasFiltradas = this.vagas.filter(vaga => 
+            vaga.titulo.toLowerCase().includes(termoLower) ||
+            vaga.localizacao.toLowerCase().includes(termoLower) ||
+            vaga.contrato.toLowerCase().includes(termoLower) ||
+            vaga.tipoLocal.toLowerCase().includes(termoLower)
+        );
+
+        this.renderizarTabela(vagasFiltradas);
+    }
+
+    formatarTipo(tipo) {
+        const tipos = {
+            'remoto': 'Remoto',
+            'hibrido': 'Híbrido',
+            'presencial': 'Presencial'
+        };
+        return tipos[tipo] || tipo;
+    }
+
+    formatarContrato(contrato) {
+        const contratos = {
+            'clt': 'CLT',
+            'pj': 'PJ',
+            'estagio': 'Estágio'
+        };
+        return contratos[contrato] || contrato;
+    }
+
+    formatarData(timestamp) {
+        if (!timestamp) return 'N/A';
+        const data = timestamp.toDate();
+        return data.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
     }
 
     salvarVaga() {
@@ -332,40 +357,37 @@ class VagasManager {
             descricao
         };
 
-        // Mostrar loading
-        const btnSalvar = document.querySelector('#form-vaga button[type="submit"]');
-        const btnTextoOriginal = btnSalvar.textContent;
+        const btnSalvar = document.getElementById('btn-salvar');
+        const iconOriginal = btnSalvar.innerHTML;
         btnSalvar.disabled = true;
-        btnSalvar.textContent = 'Salvando...';
+        btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
         if (this.vagaEditandoId) {
-            // Atualizar vaga existente
             vaga.id = this.vagaEditandoId;
             this.salvarNoFirestore(vaga, true)
                 .then(() => {
                     this.fecharModal();
-                    alert('Vaga atualizada com sucesso!');
+                    this.mostrarNotificacao('Vaga atualizada com sucesso!', 'success');
                 })
                 .catch((error) => {
-                    alert('Erro ao atualizar vaga: ' + error.message);
+                    this.mostrarNotificacao('Erro ao atualizar vaga: ' + error.message, 'error');
                 })
                 .finally(() => {
                     btnSalvar.disabled = false;
-                    btnSalvar.textContent = btnTextoOriginal;
+                    btnSalvar.innerHTML = iconOriginal;
                 });
         } else {
-            // Criar nova vaga
             this.salvarNoFirestore(vaga, false)
                 .then(() => {
                     this.fecharModal();
-                    alert('Vaga cadastrada com sucesso!');
+                    this.mostrarNotificacao('Vaga cadastrada com sucesso!', 'success');
                 })
                 .catch((error) => {
-                    alert('Erro ao cadastrar vaga: ' + error.message);
+                    this.mostrarNotificacao('Erro ao cadastrar vaga: ' + error.message, 'error');
                 })
                 .finally(() => {
                     btnSalvar.disabled = false;
-                    btnSalvar.textContent = btnTextoOriginal;
+                    btnSalvar.innerHTML = iconOriginal;
                 });
         }
     }
@@ -373,25 +395,45 @@ class VagasManager {
     editarVaga(id) {
         const vaga = this.vagas.find(v => v.id === id);
         if (vaga) {
-            this.abrirModal(vaga);
+            document.getElementById('modal-titulo').textContent = 'Editar Vaga';
+            document.getElementById('vaga-id').value = vaga.id;
+            document.getElementById('vaga-titulo').value = vaga.titulo;
+            document.getElementById('vaga-localizacao').value = vaga.localizacao;
+            document.getElementById('vaga-tipo-local').value = vaga.tipoLocal;
+            document.getElementById('vaga-contrato').value = vaga.contrato;
+            document.getElementById('vaga-descricao').value = vaga.descricao || '';
+            this.vagaEditandoId = vaga.id;
+            
+            document.getElementById('modal-vaga').classList.add('show');
         }
     }
 
     excluirVaga(id) {
-        if (confirm('Tem certeza que deseja excluir esta vaga?')) {
+        if (confirm('Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.')) {
             this.vagasCollection.doc(id).delete()
                 .then(() => {
-                    alert('Vaga excluída com sucesso!');
+                    this.mostrarNotificacao('Vaga excluída com sucesso!', 'success');
                 })
                 .catch((error) => {
                     console.error('Erro ao excluir vaga:', error);
-                    alert('Erro ao excluir vaga: ' + error.message);
+                    this.mostrarNotificacao('Erro ao excluir vaga: ' + error.message, 'error');
                 });
         }
     }
+
+    fecharModal() {
+        document.getElementById('modal-vaga').classList.remove('show');
+        document.getElementById('form-vaga').reset();
+        this.vagaEditandoId = null;
+    }
+
+    mostrarNotificacao(mensagem, tipo) {
+        // Você pode implementar um sistema de notificações toast aqui
+        alert(mensagem);
+    }
 }
 
-// Inicializar o gerenciador quando o DOM estiver pronto
+// Inicializar o gerenciador
 let vagasManager;
 document.addEventListener('DOMContentLoaded', () => {
     vagasManager = new VagasManager();
