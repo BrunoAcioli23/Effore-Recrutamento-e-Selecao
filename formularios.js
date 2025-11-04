@@ -7,6 +7,46 @@ const FORM_CONFIG = {
     // Substitua pelo seu email do FormSubmit ou use EmailJS
     endpoint: 'https://formsubmit.co/brunoeffore@outlook.com',
     
+    // Personalização de emails
+    emailSettings: {
+        // Email para receber cópias (opcional)
+        cc: '', // Ex: 'copia@exemplo.com'
+        
+        // Email oculto para cópias (opcional)
+        bcc: '', // Ex: 'gerente@exemplo.com'
+        
+        // URL de redirecionamento após envio (opcional)
+        nextPage: '', // Ex: 'https://seusite.com/obrigado.html'
+        
+        // Desativar captcha (true = sem captcha)
+        noCaptcha: true,
+        
+        // Template do email (box, table, ou deixe vazio para padrão)
+        template: 'table',
+        
+        // Mensagem de auto-resposta para o usuário
+        autoResponse: {
+            enabled: true,
+            subject: 'Recebemos sua mensagem - Effore Recrutamento',
+            message: `
+                Olá! 👋
+                
+                Recebemos sua mensagem e agradecemos pelo contato!
+                
+                Nossa equipe da Effore Recrutamento e Seleção irá analisar sua solicitação e retornar em breve.
+                
+                Tempo médio de resposta: 24 horas úteis
+                
+                Atenciosamente,
+                Equipe Effore
+                
+                📞 WhatsApp: +55 11 98372-0548
+                📧 Email: brunoeffore@outlook.com
+                📍 Salto/SP
+            `
+        }
+    },
+    
     // Mensagens de feedback
     messages: {
         success: 'Mensagem enviada com sucesso! Entraremos em contato em breve.',
@@ -19,6 +59,48 @@ const FORM_CONFIG = {
 // ===================================
 // FUNÇÕES AUXILIARES
 // ===================================
+
+// Adicionar campos de configuração ao FormData
+function addEmailSettings(formData, customSubject = '') {
+    const settings = FORM_CONFIG.emailSettings;
+    
+    // Assunto do email
+    if (customSubject) {
+        formData.append('_subject', customSubject);
+    }
+    
+    // CC (cópia)
+    if (settings.cc) {
+        formData.append('_cc', settings.cc);
+    }
+    
+    // BCC (cópia oculta)
+    if (settings.bcc) {
+        formData.append('_bcc', settings.bcc);
+    }
+    
+    // Redirecionamento
+    if (settings.nextPage) {
+        formData.append('_next', settings.nextPage);
+    }
+    
+    // Captcha
+    if (settings.noCaptcha) {
+        formData.append('_captcha', 'false');
+    }
+    
+    // Template
+    if (settings.template) {
+        formData.append('_template', settings.template);
+    }
+    
+    // Auto-resposta
+    if (settings.autoResponse && settings.autoResponse.enabled) {
+        formData.append('_autoresponse', settings.autoResponse.message);
+    }
+    
+    return formData;
+}
 
 // Mostrar mensagem de feedback
 function showMessage(formElement, message, type = 'success') {
@@ -75,7 +157,7 @@ function initContactForm() {
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Enviando...';
                 
-                const formData = new FormData(form);
+                let formData = new FormData(form);
                 
                 // Validações
                 const email = formData.get('email');
@@ -83,6 +165,9 @@ function initContactForm() {
                     showMessage(form, 'Por favor, insira um email válido.', 'error');
                     return;
                 }
+                
+                // Adiciona configurações de email personalizadas
+                formData = addEmailSettings(formData, '💬 Nova Mensagem de Contato - Effore');
                 
                 // Envia o formulário
                 const response = await fetch(FORM_CONFIG.endpoint, {
@@ -131,11 +216,10 @@ function initB2BForm() {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
             
-            const formData = new FormData(b2bForm);
+            let formData = new FormData(b2bForm);
             
-            // Adiciona informação de que é uma solicitação B2B
-            formData.append('_subject', 'Nova Solicitação B2B - Effore');
-            formData.append('_template', 'table');
+            // Adiciona configurações de email personalizadas para B2B
+            formData = addEmailSettings(formData, '🏢 Nova Solicitação B2B - Effore Recrutamento');
             
             const response = await fetch(FORM_CONFIG.endpoint, {
                 method: 'POST',
@@ -181,7 +265,7 @@ function initTalentForm() {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
             
-            const formData = new FormData(talentForm);
+            let formData = new FormData(talentForm);
             const fileInput = talentForm.querySelector('#cv-upload');
             
             // Validar arquivo
@@ -193,9 +277,8 @@ function initTalentForm() {
                 }
             }
             
-            // Adiciona informações extras
-            formData.append('_subject', 'Novo Currículo - Banco de Talentos');
-            formData.append('_template', 'table');
+            // Adiciona configurações de email personalizadas
+            formData = addEmailSettings(formData, '📄 Novo Currículo - Banco de Talentos Effore');
             
             const response = await fetch(FORM_CONFIG.endpoint, {
                 method: 'POST',
