@@ -12,6 +12,10 @@
     --color-white: #FFFFFF;
     --color-bg-light: #f9f9f9; /* Um cinza bem claro para fundos de seção */
 
+    /* Aliases para componentes */
+    --color-primary: #fd8625;
+    --color-primary-dark: #e67419;
+
     /* Fontes */
     --font-primary: 'Poppins', sans-serif;
 }

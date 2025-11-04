@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpar Dados Antigos - Effore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: #fd8625;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #e67419;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .success.show {
+            display: block;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Limpar Dados Antigos</h1>
+        <p>Este utilitário irá remover todas as vagas antigas salvas localmente no seu navegador.</p>
+        <p><strong>Importante:</strong> Após a limpeza, o sistema carregará apenas as vagas cadastradas no Firebase.</p>
+        
+        <div class="info">
+            ℹ️ <strong>Nota:</strong> Este processo é seguro e não afetará os dados do Firebase.
+        </div>
+        
+        <button class="btn" id="btn-limpar" onclick="limparDados()">Limpar Dados Agora</button>
+        
+        <div class="success" id="mensagem-sucesso">
+            ✅ <strong>Limpeza concluída com sucesso!</strong><br>
+            Dados antigos foram removidos.<br>
+            O sistema agora usa 100% Firebase.
+        </div>
+        
+        <a href="index.html" class="link" id="link-home" style="display: none;">← Voltar para Home</a>
+    </div>
+    
+    <script>
+        function limparDados() {
+            const btn = document.getElementById('btn-limpar');
+            const mensagem = document.getElementById('mensagem-sucesso');
+            const linkHome = document.getElementById('link-home');
+            
+            // Desabilita o botão
+            btn.disabled = true;
+            btn.textContent = 'Limpando...';
+            
+            // Aguarda um momento para feedback visual
+            setTimeout(() => {
+                // Remove vagas antigas do localStorage
+                let vagasRemovidas = false;
+                if (localStorage.getItem('effore_vagas')) {
+                    localStorage.removeItem('effore_vagas');
+                    vagasRemovidas = true;
+                    console.log('✅ Vagas antigas removidas do localStorage');
+                }
+                
+                // Limpa autenticação antiga
+                if (sessionStorage.getItem('isAdminAuth')) {
+                    sessionStorage.removeItem('isAdminAuth');
+                    console.log('✅ Autenticação antiga removida');
+                }
+                
+                // Mostra mensagem de sucesso
+                btn.style.display = 'none';
+                mensagem.classList.add('show');
+                linkHome.style.display = 'inline-block';
+                
+                if (vagasRemovidas) {
+                    console.log('✨ Limpeza concluída! Sistema agora usa 100% Firebase.');
+                } else {
+                    console.log('ℹ️ Nenhum dado antigo encontrado. Sistema já estava limpo.');
+                    mensagem.innerHTML = '✅ <strong>Verificação concluída!</strong><br>Nenhum dado antigo encontrado.<br>Sistema já está usando 100% Firebase.';
+                }
+            }, 1000);
+        }
+        
+        // Verifica e mostra status ao carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            const temVagasAntigas = localStorage.getItem('effore_vagas');
+            const temAuthAntiga = sessionStorage.getItem('isAdminAuth');
+            
+            if (!temVagasAntigas && !temAuthAntiga) {
+                document.querySelector('.info').innerHTML = '✅ <strong>Tudo limpo!</strong> Não há dados antigos para remover.';
+            }
+        });
+    </script>
+</body>
+</html>
