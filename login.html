@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login de Admin - Effore</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/Simbolo-Logo.png">
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/Logo-Agencia.png" alt="Effore Recrutamento e Seleção Logo">
+            </a>
+            </nav>
+    </div>
+</header>
+
+<main>
+    <section class="login-section">
+        <div class="container">
+            <div class="login-form-container">
+                <h2 class="section-title">Acesso Restrito</h2>
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                    <p id="login-error-message" class="login-error"></p>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // Script de login simples (SÓ PARA ESTA PÁGINA)
+    document.getElementById("admin-login-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Impede o envio do formulário
+
+        const passwordInput = document.getElementById("login-password");
+        const errorMessage = document.getElementById("login-error-message");
+
+        // !!! IMPORTANTE: Esta é a sua senha "secreta" !!!
+        // Lembre-se, ela é visível no código-fonte.
+        const SENHA_CORRETA = "admin123"; 
+
+        if (passwordInput.value === SENHA_CORRETA) {
+            // Se a senha estiver correta, marcamos a sessão
+            // e redirecionamos para a página de admin.
+            sessionStorage.setItem("isAdminAuth", "true");
+            window.location.href = "admin.html";
+        } else {
+            // Se a senha estiver errada
+            errorMessage.textContent = "Senha incorreta. Tente novamente.";
+            passwordInput.value = "";
+        }
+    });
+</script>
+
+</body>
+</html>

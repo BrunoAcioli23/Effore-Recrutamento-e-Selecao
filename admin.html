@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Effore</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/Simbolo-Logo.png">
+</head>
+<body>
+
+<script>
+    // Verifica se o usuário está "logado"
+    if (sessionStorage.getItem("isAdminAuth") !== "true") {
+        // Se não estiver, chuta ele de volta para a página de login
+        window.location.href = "login.html";
+    }
+</script>
+
+<header class="header">
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html" class="nav-logo">
+                <img src="assets/Logo-Agencia.png" alt="Effore Recrutamento e Seleção Logo">
+            </a>
+            <ul class="nav-menu" style="display: flex;">
+                 <li><a href="#" id="admin-logout" class="nav-link btn-outline">Sair</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <section class="page-header">
+        <div class="container">
+            <h1>Painel Administrativo</h1>
+            <p class="page-subtitle">Gerenciamento do site.</p>
+        </div>
+    </section>
+
+    <section class="admin-panel fade-in-section">
+        <div class="container">
+            <h2 class="section-title">Gerenciar Vagas</h2>
+            <p>Olá! Esta é sua área restrita.</p>
+            <p>Em um site com backend, aqui você poderia adicionar, editar ou remover as vagas que aparecem na página <a href="vagas.html">Vagas</a>.</p>
+            
+            <div class="admin-content-placeholder">
+                <h3>Vagas Atuais (Exemplo)</h3>
+                <ul>
+                    <li>Desenvolvedor(a) Backend Python Sênior <button>Editar</button></li>
+                    <li>Gerente de Projetos (Metodologia Ágil) <button>Editar</button></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    document.getElementById("admin-logout").addEventListener("click", function(e) {
+        e.preventDefault();
+        sessionStorage.removeItem("isAdminAuth"); // Limpa a sessão
+        window.location.href = "login.html"; // Manda de volta para o login
+    });
+
+    // Re-usa o script de fade-in
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelector('.admin-panel').classList.add('is-visible');
+    });
+</script>
+
+</body>
+</html>
