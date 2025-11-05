@@ -9,7 +9,7 @@ const FORM_CONFIG = {
 
     // Configuração para FormSubmit (fallback / atual)
     formsubmit: {
-        endpoint: 'https://formsubmit.co/brunoeffore@outlook.com'
+        endpoint: 'https://formsubmit.co/efforerecrutamentoeselecao@gmail.com'
     },
 
     // Configuração para EmailJS (opcional — requer conta EmailJS)
@@ -34,7 +34,7 @@ const FORM_CONFIG = {
         autoResponse: {
             enabled: true,
             subject: 'Recebemos sua mensagem - Effore Recrutamento',
-            message: `Olá! 👋\n\nRecebemos sua mensagem e agradecemos pelo contato!\n\nNossa equipe da Effore Recrutamento e Seleção irá analisar sua solicitação e retornar em breve.\n\nTempo médio de resposta: 24 horas úteis\n\nAtenciosamente,\nEquipe Effore\n\n📞 WhatsApp: +55 11 98372-0548\n📧 Email: brunoeffore@outlook.com\n📍 Salto/SP`
+            message: `Olá! 👋\n\nRecebemos sua mensagem e agradecemos pelo contato!\n\nNossa equipe da Effore Recrutamento e Seleção irá analisar sua solicitação e retornar em breve.\n\nTempo médio de resposta: 24 horas úteis\n\nAtenciosamente,\nEquipe Effore\n\n📞 WhatsApp: +55 11 98372-0548\n📧 Email: efforerecrutamentoeselecao@gmail.com\n📍 Salto/SP`
         }
     },
 
