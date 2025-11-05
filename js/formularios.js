@@ -2,51 +2,42 @@
 // CONFIGURAÇÃO DOS FORMULÁRIOS
 // ===================================
 
-// Configuração do FormSubmit (serviço gratuito de envio de formulários)
+// Configuração dos formulários e provedores de envio
 const FORM_CONFIG = {
-    // Substitua pelo seu email do FormSubmit ou use EmailJS
-    endpoint: 'https://formsubmit.co/brunoeffore@outlook.com',
-    
-    // Personalização de emails
+    // método de envio: 'formsubmit' (atual), 'emailjs' (client-side), 'webhook' (serverless)
+    provider: 'formsubmit',
+
+    // Configuração para FormSubmit (fallback / atual)
+    formsubmit: {
+        endpoint: 'https://formsubmit.co/brunoeffore@outlook.com'
+    },
+
+    // Configuração para EmailJS (opcional — requer conta EmailJS)
+    emailjs: {
+        serviceId: '',      // Ex: 'service_xxx'
+        templateId: '',     // Ex: 'template_xxx'
+        publicKey: ''       // Ex: 'user_xxx' (chave pública EmailJS)
+    },
+
+    // Para webhook/serverless (SendGrid, Mailgun, Postmark) — forneça a URL do endpoint
+    webhook: {
+        endpoint: ''
+    },
+
+    // Personalização de emails (aplicável ao FormSubmit / webhook)
     emailSettings: {
-        // Email para receber cópias (opcional)
-        cc: '', // Ex: 'copia@exemplo.com'
-        
-        // Email oculto para cópias (opcional)
-        bcc: '', // Ex: 'gerente@exemplo.com'
-        
-        // URL de redirecionamento após envio (opcional)
-        nextPage: '', // Ex: 'https://seusite.com/obrigado.html'
-        
-        // Desativar captcha (true = sem captcha)
+        cc: '',
+        bcc: '',
+        nextPage: '',
         noCaptcha: true,
-        
-        // Template do email (box, table, ou deixe vazio para padrão)
         template: 'table',
-        
-        // Mensagem de auto-resposta para o usuário
         autoResponse: {
             enabled: true,
             subject: 'Recebemos sua mensagem - Effore Recrutamento',
-            message: `
-                Olá! 👋
-                
-                Recebemos sua mensagem e agradecemos pelo contato!
-                
-                Nossa equipe da Effore Recrutamento e Seleção irá analisar sua solicitação e retornar em breve.
-                
-                Tempo médio de resposta: 24 horas úteis
-                
-                Atenciosamente,
-                Equipe Effore
-                
-                📞 WhatsApp: +55 11 98372-0548
-                📧 Email: brunoeffore@outlook.com
-                📍 Salto/SP
-            `
+            message: `Olá! 👋\n\nRecebemos sua mensagem e agradecemos pelo contato!\n\nNossa equipe da Effore Recrutamento e Seleção irá analisar sua solicitação e retornar em breve.\n\nTempo médio de resposta: 24 horas úteis\n\nAtenciosamente,\nEquipe Effore\n\n📞 WhatsApp: +55 11 98372-0548\n📧 Email: brunoeffore@outlook.com\n📍 Salto/SP`
         }
     },
-    
+
     // Mensagens de feedback
     messages: {
         success: 'Mensagem enviada com sucesso! Entraremos em contato em breve.',
@@ -62,44 +53,109 @@ const FORM_CONFIG = {
 
 // Adicionar campos de configuração ao FormData
 function addEmailSettings(formData, customSubject = '') {
+    // Mantém compatibilidade com FormSubmit
     const settings = FORM_CONFIG.emailSettings;
-    
-    // Assunto do email
-    if (customSubject) {
-        formData.append('_subject', customSubject);
-    }
-    
-    // CC (cópia)
-    if (settings.cc) {
-        formData.append('_cc', settings.cc);
-    }
-    
-    // BCC (cópia oculta)
-    if (settings.bcc) {
-        formData.append('_bcc', settings.bcc);
-    }
-    
-    // Redirecionamento
-    if (settings.nextPage) {
-        formData.append('_next', settings.nextPage);
-    }
-    
-    // Captcha
-    if (settings.noCaptcha) {
-        formData.append('_captcha', 'false');
-    }
-    
-    // Template
-    if (settings.template) {
-        formData.append('_template', settings.template);
-    }
-    
-    // Auto-resposta
-    if (settings.autoResponse && settings.autoResponse.enabled) {
-        formData.append('_autoresponse', settings.autoResponse.message);
-    }
-    
+
+    if (customSubject) formData.append('_subject', customSubject);
+    if (settings.cc) formData.append('_cc', settings.cc);
+    if (settings.bcc) formData.append('_bcc', settings.bcc);
+    if (settings.nextPage) formData.append('_next', settings.nextPage);
+    if (settings.noCaptcha) formData.append('_captcha', 'false');
+    if (settings.template) formData.append('_template', settings.template);
+    if (settings.autoResponse && settings.autoResponse.enabled) formData.append('_autoresponse', settings.autoResponse.message);
+
     return formData;
+}
+
+// ===================================
+// Email provider helpers
+// ===================================
+
+async function loadEmailJSSDK() {
+    if (window.emailjs) return window.emailjs;
+    return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.emailjs.com/sdk/3.2.0/email.min.js';
+        s.onload = () => {
+            if (window.emailjs) {
+                try {
+                    if (FORM_CONFIG.emailjs.publicKey) window.emailjs.init(FORM_CONFIG.emailjs.publicKey);
+                } catch (err) {
+                    // init may be unnecessary if using send with public key param
+                }
+                resolve(window.emailjs);
+            } else {
+                reject(new Error('EmailJS SDK não carregado'));
+            }
+        };
+        s.onerror = () => reject(new Error('Falha ao carregar EmailJS SDK'));
+        document.head.appendChild(s);
+    });
+}
+
+async function sendViaEmailJS(form, templateSubject = '') {
+    try {
+        const emailjsLib = await loadEmailJSSDK();
+        const serviceId = FORM_CONFIG.emailjs.serviceId;
+        const templateId = FORM_CONFIG.emailjs.templateId;
+        const publicKey = FORM_CONFIG.emailjs.publicKey;
+
+        if (!serviceId || !templateId || !publicKey) {
+            throw new Error('EmailJS não configurado (serviceId/templateId/publicKey faltando)');
+        }
+
+        // Constrói templateParams a partir dos campos do formulário
+        const data = new FormData(form);
+        const templateParams = {};
+        for (const [key, value] of data.entries()) {
+            templateParams[key] = value;
+        }
+        // Assunto customizável
+        if (templateSubject) templateParams['subject'] = templateSubject;
+
+        // Envia via emailjs
+        await emailjsLib.send(serviceId, templateId, templateParams, publicKey);
+        return { ok: true };
+    } catch (err) {
+        console.error('EmailJS error:', err);
+        return { ok: false, error: err };
+    }
+}
+
+async function sendViaFormSubmit(formData) {
+    const endpoint = FORM_CONFIG.formsubmit.endpoint;
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+    });
+    return response;
+}
+
+async function sendViaWebhook(formData) {
+    const endpoint = FORM_CONFIG.webhook.endpoint;
+    if (!endpoint) throw new Error('Webhook endpoint não configurado');
+    const response = await fetch(endpoint, { method: 'POST', body: formData });
+    return response;
+}
+
+async function sendForm(form, customSubject = '') {
+    // Decide o provider
+    if (FORM_CONFIG.provider === 'emailjs') {
+        const res = await sendViaEmailJS(form, customSubject);
+        return res;
+    }
+
+    // Para formsubmit/webhook precisamos de FormData
+    let formData = new FormData(form);
+    formData = addEmailSettings(formData, customSubject);
+
+    if (FORM_CONFIG.provider === 'webhook') {
+        return await sendViaWebhook(formData);
+    }
+
+    // Fallback = formsubmit
+    return await sendViaFormSubmit(formData);
 }
 
 // Mostrar mensagem de feedback
@@ -166,23 +222,14 @@ function initContactForm() {
                     return;
                 }
                 
-                // Adiciona configurações de email personalizadas
-                formData = addEmailSettings(formData, '💬 Nova Mensagem de Contato - Effore');
-                
-                // Envia o formulário
-                const response = await fetch(FORM_CONFIG.endpoint, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
+                // Envia o formulário usando o provider configurado
+                const sendResult = await sendForm(form, '💬 Nova Mensagem de Contato - Effore');
+
+                if (sendResult && sendResult.ok) {
                     showMessage(form, FORM_CONFIG.messages.success, 'success');
                     resetForm(form);
                 } else {
-                    throw new Error('Erro no servidor');
+                    throw new Error('Erro no envio');
                 }
                 
             } catch (error) {
@@ -216,24 +263,14 @@ function initB2BForm() {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
             
-            let formData = new FormData(b2bForm);
-            
-            // Adiciona configurações de email personalizadas para B2B
-            formData = addEmailSettings(formData, '🏢 Nova Solicitação B2B - Effore Recrutamento');
-            
-            const response = await fetch(FORM_CONFIG.endpoint, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
+            // Envia o formulário usando o provider configurado
+            const sendResult = await sendForm(b2bForm, '🏢 Nova Solicitação B2B - Effore Recrutamento');
+
+            if (sendResult && sendResult.ok) {
                 showMessage(b2bForm, 'Solicitação enviada! Nossa equipe entrará em contato em breve.', 'success');
                 resetForm(b2bForm);
             } else {
-                throw new Error('Erro no servidor');
+                throw new Error('Erro no envio');
             }
             
         } catch (error) {
@@ -277,22 +314,14 @@ function initTalentForm() {
                 }
             }
             
-            // Adiciona configurações de email personalizadas
-            formData = addEmailSettings(formData, '📄 Novo Currículo - Banco de Talentos Effore');
-            
-            const response = await fetch(FORM_CONFIG.endpoint, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
+            // Envia usando provider configurado (EmailJS / FormSubmit / Webhook)
+            const sendResult = await sendForm(talentForm, '📄 Novo Currículo - Banco de Talentos Effore');
+
+            if (sendResult && sendResult.ok) {
                 showMessage(talentForm, 'Currículo enviado com sucesso! Guardaremos seus dados para futuras oportunidades.', 'success');
                 resetForm(talentForm);
             } else {
-                throw new Error('Erro no servidor');
+                throw new Error('Erro no envio');
             }
             
         } catch (error) {

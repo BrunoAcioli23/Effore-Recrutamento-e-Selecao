@@ -113,3 +113,42 @@ O site é totalmente responsivo e otimizado para:
 ---
 
 © 2025 Effore Recrutamento e Seleção. Todos os direitos reservados.
+
+## ✉️ Personalização dos Emails dos Formulários
+
+Atualmente os formulários usam o serviço FormSubmit (configuração padrão). Se você quer emails mais ricos (HTML), templates dinâmicos, ou um envio mais controlado, há três opções principais:
+
+1) EmailJS (rápido, client-side)
+    - Pró: Não precisa de servidor; suporta templates HTML com variáveis;
+    - Contra: exige conta EmailJS e configurar Service ID, Template ID e Public Key; esses identificadores ficam no front-end (EmailJS usa chave pública);
+    - Como usar: crie uma conta em https://www.emailjs.com, crie um serviço (ex: Gmail/SMTP), crie um template (com variáveis como {{name}}, {{email}}, {{message}}) e copie `serviceId`, `templateId` e `publicKey`. Em `js/formularios.js` altere `FORM_CONFIG.provider = 'emailjs'` e preencha `FORM_CONFIG.emailjs`.
+
+2) Webhook + Serverless (SendGrid / Mailgun / Postmark)
+    - Pró: total controle, seguro (chaves no servidor), uso de templates avançados (SendGrid Templates), melhores taxas de entrega;
+    - Contra: requer um pequeno endpoint serverless (Netlify Functions, Vercel Serverless, Google Cloud Functions, AWS Lambda).
+    - Como usar: crie uma função que aceite POST do formulário, construa o email (HTML) usando template do provedor e envie via API do SendGrid/Mailgun. Configure `FORM_CONFIG.provider = 'webhook'` e `FORM_CONFIG.webhook.endpoint` com a URL do seu function.
+
+3) Continuar com FormSubmit (simples)
+    - Pró: sem servidor, fácil de configurar;
+    - Contra: templates limitados, menos controle sobre deliverability e branding.
+
+Implementação atual
+- Adicionamos suporte a `emailjs` e `webhook` em `js/formularios.js`.
+- Por padrão `provider` está como `'formsubmit'`. Para testar EmailJS, mude `FORM_CONFIG.provider = 'emailjs'` e preencha os campos em `FORM_CONFIG.emailjs`.
+
+Exemplo mínimo de configuração (em `js/formularios.js`):
+
+```js
+FORM_CONFIG.provider = 'emailjs';
+FORM_CONFIG.emailjs = {
+  serviceId: 'service_xxx',
+  templateId: 'template_xxx',
+  publicKey: 'user_xxx'
+};
+```
+
+Se preferir, eu mesmo posso:
+- configurar um template EmailJS de exemplo e ajustar os formulários para enviar campos bonitos (HTML);
+- ou criar uma função serverless de exemplo para enviar via SendGrid (requer API key sua).
+
+Diga qual opção prefere e eu implemento o fluxo completo com templates e testes.
