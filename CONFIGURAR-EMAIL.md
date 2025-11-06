@@ -29,10 +29,10 @@ Sistema profissional e GRATUITO com templates HTML personalizáveis!
 - Escolha seu provedor (Gmail, Outlook, etc.)
 - Siga as instruções para conectar
 
-**3. Criar Template de Email**
+**3. Criar Template UNIVERSAL (Funciona para TODOS os formulários)**
 - Vá em "Email Templates"
 - Clique em "Create New Template"
-- Use este template HTML personalizado:
+- Use este template HTML DINÂMICO que se adapta a qualquer formulário:
 
 ```html
 <!DOCTYPE html>
@@ -51,25 +51,59 @@ Sistema profissional e GRATUITO com templates HTML personalizáveis!
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎯 Nova Mensagem de Contato</h1>
+            <h1>{{tipo_formulario}}</h1>
             <p>Effore Recrutamento e Seleção</p>
         </div>
         
         <div class="content">
             <h2>Informações do Contato:</h2>
             
+            <!-- Campos que aparecem em TODOS os formulários -->
             <div class="info-row">
                 <span class="label">Nome:</span> {{from_name}}
             </div>
             <div class="info-row">
                 <span class="label">Email:</span> {{from_email}}
             </div>
+            
+            <!-- Campos OPCIONAIS (só aparecem se preenchidos) -->
+            {{#if phone}}
             <div class="info-row">
                 <span class="label">Telefone:</span> {{phone}}
             </div>
+            {{/if}}
+            
+            {{#if company}}
             <div class="info-row">
                 <span class="label">Empresa:</span> {{company}}
             </div>
+            {{/if}}
+            
+            {{#if vaga}}
+            <div class="info-row">
+                <span class="label">Vaga de Interesse:</span> {{vaga}}
+            </div>
+            {{/if}}
+            
+            {{#if cargo}}
+            <div class="info-row">
+                <span class="label">Cargo Atual:</span> {{cargo}}
+            </div>
+            {{/if}}
+            
+            {{#if linkedin}}
+            <div class="info-row">
+                <span class="label">LinkedIn:</span> <a href="{{linkedin}}">{{linkedin}}</a>
+            </div>
+            {{/if}}
+            
+            {{#if curriculo_url}}
+            <div class="info-row">
+                <span class="label">Currículo:</span> <a href="{{curriculo_url}}">Baixar Arquivo</a>
+            </div>
+            {{/if}}
+            
+            <!-- Data e Origem -->
             <div class="info-row">
                 <span class="label">Data/Hora:</span> {{date}} às {{time}}
             </div>
@@ -77,20 +111,28 @@ Sistema profissional e GRATUITO com templates HTML personalizáveis!
                 <span class="label">Origem:</span> {{origem}}
             </div>
             
+            <!-- Mensagem (se houver) -->
+            {{#if message}}
             <h3>Mensagem:</h3>
             <div style="background: white; padding: 15px; border-left: 4px solid #ff6b35; margin-top: 10px;">
                 {{message}}
             </div>
+            {{/if}}
         </div>
         
         <div class="footer">
-            <p>📧 Responda este email diretamente para: {{from_email}}</p>
+            <p>📧 Responda diretamente para: {{from_email}}</p>
             <p>💼 Effore Recrutamento e Seleção | Conectando Talentos</p>
         </div>
     </div>
 </body>
 </html>
 ```
+
+**💡 Como funciona:**
+- Use `{{#if campo}}` para campos opcionais (só aparecem se enviados)
+- Todos os formulários usam o MESMO template
+- O template se adapta automaticamente aos campos disponíveis!
 
 **4. Pegar suas Credenciais**
 - Vá em "Account" → "General"
@@ -187,7 +229,64 @@ Conectando talentos às melhores oportunidades! ✨
 
 ---
 
-## 🚀 Recomendação Final
+## � Exemplos de Uso do Template Universal
+
+### Exemplo 1: Formulário de Contato Simples
+```javascript
+const templateParams = {
+    tipo_formulario: '💬 Nova Mensagem de Contato',
+    from_name: 'João Silva',
+    from_email: 'joao@email.com',
+    phone: '(11) 98765-4321',
+    message: 'Gostaria de mais informações sobre serviços',
+    date: new Date().toLocaleDateString('pt-BR'),
+    time: new Date().toLocaleTimeString('pt-BR'),
+    origem: 'Página de Contato'
+};
+```
+
+### Exemplo 2: Formulário de Candidatura
+```javascript
+const templateParams = {
+    tipo_formulario: '🎯 Nova Candidatura',
+    from_name: 'Maria Santos',
+    from_email: 'maria@email.com',
+    phone: '(11) 91234-5678',
+    vaga: 'Desenvolvedor Full Stack',
+    cargo: 'Desenvolvedor Pleno',
+    linkedin: 'https://linkedin.com/in/mariasantos',
+    curriculo_url: 'https://drive.google.com/file/curriculo.pdf',
+    message: 'Tenho 5 anos de experiência em React e Node.js',
+    date: new Date().toLocaleDateString('pt-BR'),
+    time: new Date().toLocaleTimeString('pt-BR'),
+    origem: 'Página de Vagas'
+};
+```
+
+### Exemplo 3: Formulário de Lead (Empresa)
+```javascript
+const templateParams = {
+    tipo_formulario: '🏢 Nova Empresa Interessada',
+    from_name: 'Carlos Oliveira',
+    from_email: 'carlos@empresa.com',
+    phone: '(11) 4567-8900',
+    company: 'Tech Solutions LTDA',
+    message: 'Precisamos contratar 3 desenvolvedores',
+    date: new Date().toLocaleDateString('pt-BR'),
+    time: new Date().toLocaleTimeString('pt-BR'),
+    origem: 'Página Para Empresas'
+};
+```
+
+**✨ Vantagens:**
+- ✅ **1 único template** para todos os formulários
+- ✅ Campos opcionais **não aparecem** se vazios
+- ✅ **Fácil manutenção** - altere em um só lugar
+- ✅ **Flexível** - adicione novos campos quando quiser
+
+---
+
+## �🚀 Recomendação Final
 
 **Para começar AGORA:** Use FormSubmit (já está configurado e melhorado!)
 
