@@ -40,19 +40,26 @@ Sistema profissional e GRATUITO com templates HTML personalizáveis!
 <head>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); padding: 30px; text-align: center; color: white; }
-        .content { background: #f9f9f9; padding: 30px; border-radius: 8px; margin: 20px 0; }
-        .info-row { padding: 10px 0; border-bottom: 1px solid #eee; }
-        .label { font-weight: bold; color: #ff6b35; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff; }
+        .header { background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); padding: 30px 20px; text-align: center; color: white; border-radius: 8px 8px 0 0; }
+        .logo { max-width: 200px; height: auto; margin-bottom: 15px; }
+        .header h1 { margin: 10px 0; font-size: 24px; }
+        .header p { margin: 5px 0; font-size: 16px; opacity: 0.95; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; margin: 0; }
+        .info-row { padding: 10px 0; border-bottom: 1px solid #e0e0e0; }
+        .label { font-weight: bold; color: #ff6b35; display: inline-block; min-width: 120px; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; border-top: 2px solid #ff6b35; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <!-- Logo da Effore -->
+            <img src="https://raw.githubusercontent.com/BrunoAcioli23/Effore-Recrutamento-e-Selecao/main/assets/Logo-Agencia.png" 
+                 alt="Effore Recrutamento e Seleção" 
+                 class="logo">
             <h1>{{tipo_formulario}}</h1>
-            <p>Effore Recrutamento e Seleção</p>
+            <p>Conectando Talentos às Melhores Oportunidades</p>
         </div>
         
         <div class="content">
@@ -133,6 +140,37 @@ Sistema profissional e GRATUITO com templates HTML personalizáveis!
 - Use `{{#if campo}}` para campos opcionais (só aparecem se enviados)
 - Todos os formulários usam o MESMO template
 - O template se adapta automaticamente aos campos disponíveis!
+- ✨ **Logo incluída no cabeçalho!**
+
+---
+
+### 🎨 **Sobre a Logo no Email:**
+
+A logo está sendo carregada do GitHub:
+```
+https://raw.githubusercontent.com/BrunoAcioli23/Effore-Recrutamento-e-Selecao/main/assets/Logo-Agencia.png
+```
+
+**Alternativas de hospedagem (se preferir):**
+
+1. **Imgur** (Recomendado - Simples):
+   - Acesse: https://imgur.com/upload
+   - Faça upload da logo
+   - Clique com botão direito → "Copiar endereço da imagem"
+   - Substitua no template
+
+2. **Google Drive**:
+   - Faça upload da logo
+   - Compartilhe como "Qualquer pessoa com o link"
+   - Use: `https://drive.google.com/uc?export=view&id=SEU_FILE_ID`
+
+3. **Seu próprio site**:
+   - Se tiver hospedagem web
+   - Use: `https://www.efforerecursoshumanos.com.br/assets/logo.png`
+
+**⚠️ Importante:** A imagem precisa estar em uma URL pública para aparecer nos emails!
+
+---
 
 **4. Pegar suas Credenciais**
 - Vá em "Account" → "General"
@@ -229,7 +267,47 @@ Conectando talentos às melhores oportunidades! ✨
 
 ---
 
-## � Exemplos de Uso do Template Universal
+## 👁️ Preview do Email com Logo
+
+```
+╔══════════════════════════════════════════════════════╗
+║                                                      ║
+║              [LOGO EFFORE AQUI]                     ║
+║                                                      ║
+║         💬 Nova Mensagem de Contato                 ║
+║    Conectando Talentos às Melhores Oportunidades   ║
+║                                                      ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  📋 Informações do Contato:                         ║
+║                                                      ║
+║  Nome:        João Silva                            ║
+║  Email:       joao@email.com                        ║
+║  Telefone:    (11) 98765-4321                       ║
+║  Data/Hora:   05/11/2025 às 20:30                  ║
+║  Origem:      Página de Contato                     ║
+║                                                      ║
+║  Mensagem:                                           ║
+║  ┃ Gostaria de mais informações sobre serviços     ║
+║                                                      ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  📧 Responda diretamente para: joao@email.com       ║
+║  💼 Effore Recrutamento e Seleção                   ║
+║                                                      ║
+╚══════════════════════════════════════════════════════╝
+```
+
+**Design profissional com:**
+- ✅ Logo da empresa no topo
+- ✅ Gradiente laranja (cores da marca)
+- ✅ Layout limpo e organizado
+- ✅ Bordas arredondadas
+- ✅ Responsivo (funciona em mobile)
+
+---
+
+## 📝 Exemplos de Uso do Template Universal
 
 ### Exemplo 1: Formulário de Contato Simples
 ```javascript
