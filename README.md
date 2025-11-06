@@ -152,3 +152,17 @@ Se preferir, eu mesmo posso:
 - ou criar uma função serverless de exemplo para enviar via SendGrid (requer API key sua).
 
 Diga qual opção prefere e eu implemento o fluxo completo com templates e testes.
+
+Onde encontrar os templates HTML
+--------------------------------
+Criei exemplos prontos na pasta `email-templates/` do repositório:
+
+- `email-templates/contact-template.html` — template para formulário de contato
+- `email-templates/b2b-template.html` — template para solicitações B2B
+- `email-templates/talent-template.html` — template para envio de currículos
+
+Como usar:
+- Copie o HTML desses arquivos para criar templates no EmailJS (cole o HTML no editor de template) e então use os Template IDs em `FORM_CONFIG.templates.*.emailjsTemplateId`.
+- Ou use esses arquivos como base no seu serverless (webhook) para enviar via SendGrid/Mailgun/Postmark.
+
+Observação: o frontend já gera automaticamente um campo `_html` com uma versão simples do HTML (pré-visualização) e o envia junto ao formulário — útil para seu webhook usar sem precisar reconstruir tudo no servidor.

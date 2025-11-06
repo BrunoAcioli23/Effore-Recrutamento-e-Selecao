@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nova mensagem de contato</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; color:#111; background:#f7f7f8; }
+    .card { max-width:700px; margin:24px auto; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 6px 30px rgba(0,0,0,0.08); }
+    .header { background:linear-gradient(90deg,#ff6b35,#ff8c42); color:#fff; padding:18px 24px; }
+    .body { padding:20px 24px; }
+    table { width:100%; border-collapse:collapse; }
+    td { padding:8px 6px; vertical-align:top; }
+    .label { font-weight:700; color:#333; width:150px; }
+    .footer { font-size:13px; color:#666; padding:16px 24px; background:#fafafa; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2>Nova mensagem recebida — Effore</h2>
+    </div>
+    <div class="body">
+      <p>Você recebeu uma nova mensagem através do formulário de contato do site.</p>
+      <table>
+        <tr><td class="label">Nome</td><td>{{name}}</td></tr>
+        <tr><td class="label">Email</td><td>{{email}}</td></tr>
+        <tr><td class="label">Telefone</td><td>{{phone}}</td></tr>
+        <tr><td class="label">Mensagem</td><td>{{message}}</td></tr>
+        <tr><td class="label">Página</td><td>{{page}}</td></tr>
+      </table>
+    </div>
+    <div class="footer">Recebido em {{received_at}} — Effore Recrutamento e Seleção</div>
+  </div>
+</body>
+</html>

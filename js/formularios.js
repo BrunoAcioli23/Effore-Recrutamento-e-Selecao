@@ -37,6 +37,25 @@ const FORM_CONFIG = {
             message: `Olá! 👋\n\nRecebemos sua mensagem e agradecemos pelo contato!\n\nNossa equipe da Effore Recrutamento e Seleção irá analisar sua solicitação e retornar em breve.\n\nTempo médio de resposta: 24 horas úteis\n\nAtenciosamente,\nEquipe Effore\n\n📞 WhatsApp: +55 11 98372-0548\n📧 Email: efforerecrutamentoeselecao@gmail.com\n📍 Salto/SP`
         }
     },
+    // Templates por tipo de formulário (contact, b2b, talent)
+    templates: {
+        contact: {
+            // usado por EmailJS (templateId) e FormSubmit (template)
+            emailjsTemplateId: '',
+            formsubmitTemplate: 'table',
+            subject: '💬 Nova Mensagem de Contato - Effore'
+        },
+        b2b: {
+            emailjsTemplateId: '',
+            formsubmitTemplate: 'table',
+            subject: '🏢 Nova Solicitação B2B - Effore'
+        },
+        talent: {
+            emailjsTemplateId: '',
+            formsubmitTemplate: 'table',
+            subject: '📄 Novo Currículo - Banco de Talentos Effore'
+        }
+    },
 
     // Mensagens de feedback
     messages: {
@@ -93,11 +112,11 @@ async function loadEmailJSSDK() {
     });
 }
 
-async function sendViaEmailJS(form, templateSubject = '') {
+async function sendViaEmailJS(form, templateSubject = '', templateIdOverride = '') {
     try {
         const emailjsLib = await loadEmailJSSDK();
         const serviceId = FORM_CONFIG.emailjs.serviceId;
-        const templateId = FORM_CONFIG.emailjs.templateId;
+        const templateId = templateIdOverride || FORM_CONFIG.emailjs.templateId;
         const publicKey = FORM_CONFIG.emailjs.publicKey;
 
         if (!serviceId || !templateId || !publicKey) {
@@ -140,22 +159,72 @@ async function sendViaWebhook(formData) {
 }
 
 async function sendForm(form, customSubject = '') {
+    // Detecta o tipo de formulário (contact, b2b, talent)
+    const formType = detectFormType(form);
+    const templateCfg = FORM_CONFIG.templates[formType] || {};
+
     // Decide o provider
     if (FORM_CONFIG.provider === 'emailjs') {
-        const res = await sendViaEmailJS(form, customSubject);
+        // usa templateId específico do form se disponível
+        const templateId = templateCfg.emailjsTemplateId || FORM_CONFIG.emailjs.templateId || '';
+        const res = await sendViaEmailJS(form, customSubject || templateCfg.subject || '', templateId);
         return res;
     }
 
     // Para formsubmit/webhook precisamos de FormData
     let formData = new FormData(form);
-    formData = addEmailSettings(formData, customSubject);
+    // se não passou subject, usa o subject do template
+    const subjectToUse = customSubject || templateCfg.subject || '';
+    formData = addEmailSettings(formData, subjectToUse);
+
+    // Marca tipo do formulário para o webhook/template
+    formData.append('_formType', formType);
+
+    // Adiciona HTML gerado como preview (útil para webhook ou para criar templates rapidamente)
+    try {
+        const fieldsObj = Object.fromEntries(formData.entries());
+        const html = generateEmailHTML(formType, fieldsObj);
+        if (html) formData.append('_html', html);
+    } catch (err) {
+        // não bloquear envio por erro de geração de HTML
+        console.warn('Não foi possível gerar pré-visualização HTML:', err);
+    }
 
     if (FORM_CONFIG.provider === 'webhook') {
         return await sendViaWebhook(formData);
     }
 
-    // Fallback = formsubmit
+    // Fallback = formsubmit (usa template configurado por tipo quando possível)
+    if (templateCfg.formsubmitTemplate) {
+        formData.append('_template', templateCfg.formsubmitTemplate);
+    }
     return await sendViaFormSubmit(formData);
+}
+
+// Detecta tipo de formulário com base em classes
+function detectFormType(form) {
+    if (form.classList.contains('contact-form-b2b')) return 'b2b';
+    if (form.classList.contains('talent-form')) return 'talent';
+    // default / contact
+    return 'contact';
+}
+
+// Gerador simples de HTML por tipo de formulário (fallback para webhook / preview)
+function generateEmailHTML(formType, fields) {
+    // pequenas helpers
+    const esc = v => (v===undefined || v===null) ? '' : String(v).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    const received_at = new Date().toLocaleString('pt-BR');
+
+    if (formType === 'b2b') {
+        return `<!doctype html><html><body><h2>Solicitação B2B</h2><p><strong>Empresa:</strong> ${esc(fields.company)}<br><strong>Contato:</strong> ${esc(fields.contact_name)} — ${esc(fields.contact_email)} — ${esc(fields.contact_phone)}</p><p><strong>Vaga / Perfil:</strong> ${esc(fields.position)}<br><strong>Local:</strong> ${esc(fields.location)}</p><p><strong>Mensagem:</strong><br>${esc(fields.message)}</p><p>Recebido em ${received_at}</p></body></html>`;
+    }
+
+    if (formType === 'talent') {
+        return `<!doctype html><html><body><h2>Novo Currículo</h2><p><strong>Nome:</strong> ${esc(fields.name)}<br><strong>Email:</strong> ${esc(fields.email)}<br><strong>Telefone:</strong> ${esc(fields.phone)}</p><p><strong>Área:</strong> ${esc(fields.area)}<br><strong>Mensagem:</strong><br>${esc(fields.message)}</p><p><strong>CV:</strong> ${esc(fields.cv_url || fields.cv)}</p><p>Recebido em ${received_at}</p></body></html>`;
+    }
+
+    // default contact
+    return `<!doctype html><html><body><h2>Nova Mensagem de Contato</h2><p><strong>Nome:</strong> ${esc(fields.name)}<br><strong>Email:</strong> ${esc(fields.email)}<br><strong>Telefone:</strong> ${esc(fields.phone)}</p><p><strong>Mensagem:</strong><br>${esc(fields.message)}</p><p>Recebido em ${received_at}</p></body></html>`;
 }
 
 // Mostrar mensagem de feedback
