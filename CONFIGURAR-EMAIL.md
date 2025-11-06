@@ -55,7 +55,7 @@ Sistema profissional e GRATUITO com templates HTML personalizáveis!
     <div class="container">
         <div class="header">
             <!-- Logo da Effore -->
-            <img src="https://raw.githubusercontent.com/BrunoAcioli23/Effore-Recrutamento-e-Selecao/main/assets/Logo-Agencia.png" 
+            <img src="https://raw.githubusercontent.com/BrunoAcioli23/Effore-Recrutamento-e-Selecao/main/assets/Simbolo-Logo.png" 
                  alt="Effore Recrutamento e Seleção" 
                  class="logo">
             <h1>{{tipo_formulario}}</h1>
@@ -181,9 +181,9 @@ https://raw.githubusercontent.com/BrunoAcioli23/Effore-Recrutamento-e-Selecao/ma
 No arquivo `js/formularios.js`, altere:
 ```javascript
 const EMAILJS_CONFIG = {
-    serviceID: 'seu_service_id_aqui',
-    templateID: 'seu_template_id_aqui',
-    publicKey: 'sua_public_key_aqui',
+    serviceID: 'service_5moijx3',
+    templateID: 'template_zdbwix4',
+    publicKey: '9xpGaGxu_I-hoVZn0',
     enabled: true // IMPORTANTE: Mude para true!
 };
 ```

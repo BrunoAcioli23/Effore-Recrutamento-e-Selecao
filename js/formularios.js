@@ -4,14 +4,14 @@
 
 // CONFIGURAÇÃO EMAILJS (Recomendado - Mais profissional)
 const EMAILJS_CONFIG = {
-    serviceID: 'seu_service_id',      // Substituir após criar conta
-    templateID: 'template_universal',  // Nome do seu template
-    publicKey: 'sua_public_key',      // Sua chave pública
-    enabled: false // Mude para TRUE após configurar
+    serviceID: 'service_5moijx3',
+    templateID: 'template_zdbwix4',
+    publicKey: '9xpGaGxu_I-hoVZn0',
+    enabled: true // IMPORTANTE: Mude para true!
 };
 
 // CONFIGURAÇÃO FORMSUBMIT (Backup - Já funciona)
-const FORMSUBMIT_ENDPOINT = 'https://formsubmit.co/brunoeffore@outlook.com';
+const FORMSUBMIT_ENDPOINT = 'https://formsubmit.co/efforerecrutamentoeselecao@gmail.com';
 
 // ===================================
 // FUNÇÃO PARA ENVIAR VIA EMAILJS
