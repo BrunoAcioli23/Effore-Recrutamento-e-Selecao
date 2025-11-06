@@ -5,7 +5,7 @@
 // Configuração do FormSubmit (serviço gratuito de envio de formulários)
 const FORM_CONFIG = {
     // Substitua pelo seu email do FormSubmit ou use EmailJS
-    endpoint: 'https://formsubmit.co/brunoeffore@outlook.com',
+    endpoint: 'https://formsubmit.co/efforerecrutamentoeselecao@gmail.com',
     // Se true, envia via fetch (AJAX). Se false, usa submissão nativa do formulário (recomendado para FormSubmit
     // quando quiser autoresponse/templates funcionando corretamente).
     useAjax: false,
@@ -44,7 +44,7 @@ const FORM_CONFIG = {
                 Equipe Effore
                 
                 📞 WhatsApp: +55 11 98372-0548
-                📧 Email: brunoeffore@outlook.com
+                📧 Email: efforerecrutamentoeselecao@gmail.com
                 📍 Salto/SP
             `
         }
