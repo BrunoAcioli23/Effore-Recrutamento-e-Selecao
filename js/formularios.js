@@ -7,7 +7,7 @@ const EMAILJS_CONFIG = {
     serviceID: 'service_5moijx3',
     templateID: 'template_zdbwix4',
     publicKey: '9xpGaGxu_I-hoVZn0',
-    enabled: true // IMPORTANTE: Mude para true!
+    enabled: false // DESABILITADO - Usando FormSubmit
 };
 
 // CONFIGURAÇÃO FORMSUBMIT (Backup - Já funciona)
@@ -22,25 +22,45 @@ async function enviarViaEmailJS(formData, tipoFormulario) {
     }
 
     try {
-        // Preparar parâmetros do template (campos dinâmicos)
+        // Montar mensagem completa com todos os campos
+        let mensagemCompleta = `${tipoFormulario}\n\n`;
+        mensagemCompleta += `═══════════════════════════════\n`;
+        mensagemCompleta += `Nome: ${formData.get('name') || 'Não informado'}\n`;
+        mensagemCompleta += `Email: ${formData.get('email') || 'Não informado'}\n`;
+        
+        if (formData.get('phone')) {
+            mensagemCompleta += `Telefone: ${formData.get('phone')}\n`;
+        }
+        if (formData.get('company')) {
+            mensagemCompleta += `Empresa: ${formData.get('company')}\n`;
+        }
+        if (formData.get('vaga')) {
+            mensagemCompleta += `Vaga: ${formData.get('vaga')}\n`;
+        }
+        if (formData.get('cargo')) {
+            mensagemCompleta += `Cargo: ${formData.get('cargo')}\n`;
+        }
+        if (formData.get('linkedin')) {
+            mensagemCompleta += `LinkedIn: ${formData.get('linkedin')}\n`;
+        }
+        if (formData.get('curriculo')) {
+            mensagemCompleta += `Currículo: ${formData.get('curriculo')}\n`;
+        }
+        
+        mensagemCompleta += `Data/Hora: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\n`;
+        mensagemCompleta += `Origem: ${window.location.pathname}\n`;
+        mensagemCompleta += `═══════════════════════════════\n\n`;
+        
+        if (formData.get('message')) {
+            mensagemCompleta += `Mensagem:\n${formData.get('message')}`;
+        }
+
+        // Preparar parâmetros simplificados (compatível com template básico)
         const templateParams = {
-            tipo_formulario: tipoFormulario,
-            from_name: formData.get('name') || '',
-            from_email: formData.get('email') || '',
-            
-            // Campos opcionais (só envia se existir)
-            phone: formData.get('phone') || '',
-            company: formData.get('company') || '',
-            vaga: formData.get('vaga') || '',
-            cargo: formData.get('cargo') || '',
-            linkedin: formData.get('linkedin') || '',
-            curriculo_url: formData.get('curriculo') || '',
-            message: formData.get('message') || '',
-            
-            // Informações extras
-            date: new Date().toLocaleDateString('pt-BR'),
-            time: new Date().toLocaleTimeString('pt-BR'),
-            origem: formData.get('origem') || window.location.pathname
+            from_name: formData.get('name') || 'Não informado',
+            from_email: formData.get('email') || 'nao-informado@email.com',
+            message: mensagemCompleta,
+            reply_to: formData.get('email') || 'nao-informado@email.com'
         };
 
         // Enviar email
@@ -60,17 +80,44 @@ async function enviarViaEmailJS(formData, tipoFormulario) {
 }
 
 // ===================================
-// FUNÇÃO PARA ENVIAR VIA FORMSUBMIT
+// FUNÇÃO PARA ENVIAR VIA FORMSUBMIT (MÉTODO DIRETO)
 // ===================================
-async function enviarViaFormSubmit(form, assunto) {
-    try {
-        const formData = new FormData(form);
-        formData.append('_subject', assunto);
-        formData.append('_template', 'table');
-        formData.append('_captcha', 'false');
-        
-        const nome = formData.get('name') || 'Cliente';
-        const autoResponse = `Olá ${nome}! 👋
+function enviarViaFormSubmitDireto(form, assunto) {
+    // Remover campos ocultos anteriores (se existirem)
+    const existingHidden = form.querySelectorAll('input[type="hidden"][name^="_"]');
+    existingHidden.forEach(input => input.remove());
+    
+    // Adicionar campos ocultos necessários
+    const subjectInput = document.createElement('input');
+    subjectInput.type = 'hidden';
+    subjectInput.name = '_subject';
+    subjectInput.value = assunto;
+    form.appendChild(subjectInput);
+    
+    const templateInput = document.createElement('input');
+    templateInput.type = 'hidden';
+    templateInput.name = '_template';
+    templateInput.value = 'table';
+    form.appendChild(templateInput);
+    
+    const captchaInput = document.createElement('input');
+    captchaInput.type = 'hidden';
+    captchaInput.name = '_captcha';
+    captchaInput.value = 'false';
+    form.appendChild(captchaInput);
+    
+    // Redirecionar de volta para a página atual após envio
+    const nextInput = document.createElement('input');
+    nextInput.type = 'hidden';
+    nextInput.name = '_next';
+    nextInput.value = window.location.href + '?enviado=sucesso';
+    form.appendChild(nextInput);
+    
+    const nome = form.querySelector('[name="name"]')?.value || 'Cliente';
+    const autoResponseInput = document.createElement('input');
+    autoResponseInput.type = 'hidden';
+    autoResponseInput.name = '_autoresponse';
+    autoResponseInput.value = `Olá ${nome}! 👋
 
 ✅ Recebemos sua mensagem!
 
@@ -83,61 +130,48 @@ NOSSOS CANAIS:
 
 Atenciosamente,
 Equipe Effore Recrutamento e Seleção`;
-        
-        formData.append('_autoresponse', autoResponse);
-        
-        const response = await fetch(FORMSUBMIT_ENDPOINT, {
-            method: 'POST',
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-        });
-        
-        console.log('✅ Email enviado via FormSubmit');
-        return response.ok;
-    } catch (error) {
-        console.error('❌ Erro FormSubmit:', error);
-        return false;
-    }
+    form.appendChild(autoResponseInput);
+    
+    // Configurar action e method
+    form.action = FORMSUBMIT_ENDPOINT;
+    form.method = 'POST';
+    
+    console.log('🚀 Enviando via FormSubmit (método direto)...');
+    console.log('📧 Para:', FORMSUBMIT_ENDPOINT);
+    console.log('📋 Assunto:', assunto);
+    
+    // Enviar o formulário
+    form.submit();
+    
+    return true;
 }
 
 // ===================================
-// HANDLER PRINCIPAL - GERENCIA OS DOIS MÉTODOS
+// HANDLER PRINCIPAL - ENVIO DIRETO VIA FORMSUBMIT
 // ===================================
-async function enviarFormulario(form, assunto, tipoFormulario) {
+function enviarFormulario(form, assunto, tipoFormulario) {
     const btn = form.querySelector('button[type=submit]');
     const textoOriginal = btn.textContent;
     
-    try {
-        btn.disabled = true;
-        btn.innerHTML = '⏳ Enviando...';
-        
-        const formData = new FormData(form);
-        let sucesso = false;
-
-        // PRIORIDADE 1: Tentar EmailJS (se configurado)
-        if (EMAILJS_CONFIG.enabled) {
-            sucesso = await enviarViaEmailJS(formData, tipoFormulario);
-        }
-
-        // PRIORIDADE 2: Usar FormSubmit como backup
-        if (!sucesso) {
-            sucesso = await enviarViaFormSubmit(form, assunto);
-        }
-
-        if (sucesso) {
-            alert('✅ Mensagem enviada com sucesso!');
-            form.reset();
-        } else {
-            throw new Error('Falha no envio');
-        }
-        
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('❌ Erro ao enviar. Tente pelo WhatsApp: (11) 98372-0548');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = textoOriginal;
+    // Validar campos obrigatórios
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
     }
+    
+    // Mostrar feedback visual
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Enviando...';
+    
+    console.log(`📤 Enviando formulário: ${tipoFormulario}`);
+    console.log(`📧 Destino: ${FORMSUBMIT_ENDPOINT}`);
+    console.log(`📋 Assunto: ${assunto}`);
+    
+    // Usar FormSubmit direto (método mais confiável)
+    enviarViaFormSubmitDireto(form, assunto);
+    
+    // Nota: O formulário será redirecionado pelo FormSubmit
+    // Não há need de resetar ou restaurar o botão aqui
 }
 
 // ===================================
@@ -146,8 +180,17 @@ async function enviarFormulario(form, assunto, tipoFormulario) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Inicializando formulários Effore...');
     
+    // Verificar se voltou de um envio bem-sucedido
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('enviado') === 'sucesso') {
+        alert('✅ Mensagem enviada com sucesso!\n\nNossa equipe entrará em contato em breve.');
+        // Limpar a URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
     // FORMULÁRIO DE CONTATO GERAL
     const formsContato = document.querySelectorAll('.contact-form');
+    console.log(`📝 Encontrados ${formsContato.length} formulário(s) de contato`);
     formsContato.forEach(form => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -161,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // FORMULÁRIO DE CANDIDATURA
     const formsCandidatura = document.querySelectorAll('.candidatura-form');
+    console.log(`📝 Encontrados ${formsCandidatura.length} formulário(s) de candidatura`);
     formsCandidatura.forEach(form => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -175,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // FORMULÁRIO PARA EMPRESAS
     const formsEmpresa = document.querySelectorAll('.lead-form, .empresa-form');
+    console.log(`📝 Encontrados ${formsEmpresa.length} formulário(s) para empresas`);
     formsEmpresa.forEach(form => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -187,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     console.log('✅ Formulários inicializados!');
+    console.log('📧 Email de destino:', FORMSUBMIT_ENDPOINT);
 });
 
 // ===================================
