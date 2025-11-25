@@ -658,7 +658,8 @@ body::before {
 }
 
 /* Reutiliza .contact-form mas com fundo escuro */
-.contact-form-b2b label {
+.contact-form-b2b label,
+.empresa-form label {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
@@ -666,7 +667,9 @@ body::before {
 }
 
 .contact-form-b2b input,
-.contact-form-b2b textarea {
+.contact-form-b2b textarea,
+.empresa-form input,
+.empresa-form textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #555; /* Borda mais escura */
@@ -676,18 +679,21 @@ body::before {
     color: var(--color-white); /* Texto do input */
 }
 
-.contact-form-b2b .form-group {
+.contact-form-b2b .form-group,
+.empresa-form .form-group {
     margin-bottom: 20px;
 }
 
-.contact-form-b2b button {
+.contact-form-b2b button,
+.empresa-form button {
     width: 100%;
     font-size: 1.1rem;
     background-color: var(--color-white); /* Botão branco */
     color: var(--color-black); /* Texto preto */
 }
 
-.contact-form-b2b button:hover {
+.contact-form-b2b button:hover,
+.empresa-form button:hover {
     background-color: var(--color-orange);
     color: var(--color-black);
 }
