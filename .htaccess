@@ -1,0 +1,31 @@
+# Habilitar RewriteEngine
+RewriteEngine On
+
+# Remover .html da URL
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.html [NC,L]
+
+# Redirecionar URLs com .html para URLs sem .html
+RewriteCond %{THE_REQUEST} ^GET\ /(.*)\.html(\?[^\ ]*)?\ HTTP
+RewriteRule (.*)\.html$ /$1 [R=301,L]
+
+# Configurações de segurança
+Options -Indexes
+
+# Habilitar compressão
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule>
+
+# Cache de navegador
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
