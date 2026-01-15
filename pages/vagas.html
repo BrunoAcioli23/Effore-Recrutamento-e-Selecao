@@ -79,18 +79,26 @@
         <section id="vagas-abertas" class="jobs-page-section fade-in-section">
             <div class="container">
                 <div class="job-filters">
-                    <input type="text" placeholder="Cargo ou palavra-chave..." class="filter-input">
+                    <input type="text" placeholder="Cargo, palavra-chave ou cidade..." class="filter-input">
                     <select class="filter-select">
-                        <option value="">Localização</option>
-                        <option value="remoto">Remoto</option>
-                        <option value="hibrido">Híbrido</option>
-                        <option value="presencial">Presencial</option>
+                        <option value="">Todas as Cidades</option>
+                        <option value="são paulo">São Paulo</option>
+                        <option value="rio de janeiro">Rio de Janeiro</option>
+                        <option value="belo horizonte">Belo Horizonte</option>
+                        <option value="brasília">Brasília</option>
+                        <option value="curitiba">Curitiba</option>
+                        <option value="porto alegre">Porto Alegre</option>
+                        <option value="salvador">Salvador</option>
+                        <option value="recife">Recife</option>
+                        <option value="fortaleza">Fortaleza</option>
                     </select>
                     <select class="filter-select">
                         <option value="">Tipo de Contrato</option>
                         <option value="clt">CLT</option>
                         <option value="pj">PJ</option>
                         <option value="estagio">Estágio</option>
+                        <option value="temporario">Temporário</option>
+                        <option value="freelancer">Freelancer</option>
                     </select>
                     <button class="btn btn-primary">Buscar</button>
                 </div>
@@ -189,6 +197,130 @@
         </section>
 
     </main>
+
+    <!-- Modal de Detalhes da Vaga -->
+    <div id="modal-detalhes-vaga" class="modal-detalhes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; overflow-y: auto; padding: 20px;">
+        <div class="modal-detalhes-content" style="background: white; max-width: 800px; margin: 40px auto; border-radius: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: slideDown 0.3s ease;">
+            <!-- Header do Modal -->
+            <div class="modal-detalhes-header" style="background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; position: relative;">
+                <button class="modal-close-btn" onclick="fecharModalDetalhes()" style="position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h2 id="modal-titulo-vaga" style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700; padding-right: 50px;"></h2>
+                <p id="modal-empresa-nome" style="margin: 0; opacity: 0.9; font-size: 16px;">Effore Recrutamento e Seleção</p>
+            </div>
+            
+            <!-- Corpo do Modal -->
+            <div class="modal-detalhes-body" style="padding: 30px;">
+                <!-- Informações Principais -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                    <div>
+                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-money-bill-wave" style="color: #ff6b35; margin-right: 5px;"></i> Salário
+                        </div>
+                        <div id="modal-salario" style="font-size: 18px; color: #ff6b35; font-weight: 700;"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-briefcase" style="color: #ff6b35; margin-right: 5px;"></i> Contrato
+                        </div>
+                        <div id="modal-contrato" style="font-size: 18px; color: #333; font-weight: 600;"></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-map-marker-alt" style="color: #ff6b35; margin-right: 5px;"></i> Localização
+                        </div>
+                        <div id="modal-cidade" style="font-size: 18px; color: #333; font-weight: 600;"></div>
+                    </div>
+                    <div id="modal-horario-container">
+                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-clock" style="color: #ff6b35; margin-right: 5px;"></i> Horário
+                        </div>
+                        <div id="modal-horario" style="font-size: 18px; color: #333; font-weight: 600;"></div>
+                    </div>
+                </div>
+
+                <!-- Descrição -->
+                <div id="modal-descricao-container" style="margin-bottom: 30px;">
+                    <h3 style="font-size: 20px; color: #1a1a1a; margin: 0 0 15px 0; font-weight: 700; border-bottom: 2px solid #ff6b35; padding-bottom: 10px;">
+                        <i class="fas fa-file-alt" style="color: #ff6b35; margin-right: 8px;"></i> Descrição da Vaga
+                    </h3>
+                    <div id="modal-descricao" style="font-size: 15px; color: #555; line-height: 1.8; white-space: pre-line;"></div>
+                </div>
+
+                <!-- Benefícios -->
+                <div id="modal-beneficios-container">
+                    <h3 style="font-size: 20px; color: #1a1a1a; margin: 0 0 15px 0; font-weight: 700; border-bottom: 2px solid #ff6b35; padding-bottom: 10px;">
+                        <i class="fas fa-gift" style="color: #ff6b35; margin-right: 8px;"></i> Benefícios
+                    </h3>
+                    <div id="modal-beneficios" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+                </div>
+
+                <!-- Data de Publicação -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e5e5; font-size: 14px; color: #999;">
+                    <i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> Publicada em <span id="modal-data-criacao"></span>
+                </div>
+            </div>
+
+            <!-- Footer do Modal -->
+            <div class="modal-detalhes-footer" style="padding: 20px 30px; background: #f8f9fa; border-radius: 0 0 16px 16px; display: flex; gap: 12px; justify-content: flex-end;">
+                <button onclick="fecharModalDetalhes()" style="padding: 12px 24px; background: #e5e5e5; color: #666; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                    Fechar
+                </button>
+                <button onclick="scrollToFormulario()" style="padding: 12px 32px; background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);">
+                    <i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Candidatar-se Agora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+            transform: rotate(90deg);
+        }
+
+        .modal-detalhes-footer button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-detalhes::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .modal-detalhes::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-detalhes::-webkit-scrollbar-thumb {
+            background: #ff6b35;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-detalhes-content {
+                margin: 20px auto !important;
+            }
+            .modal-detalhes-body {
+                padding: 20px !important;
+            }
+            .modal-detalhes-body > div[style*="grid"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
 
     <footer class="footer">
         <div class="container">

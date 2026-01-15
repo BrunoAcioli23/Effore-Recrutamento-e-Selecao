@@ -81,18 +81,24 @@ class VagasManager {
             if (isUpdate) {
                 await this.vagasCollection.doc(vaga.id).update({
                     titulo: vaga.titulo,
-                    localizacao: vaga.localizacao,
-                    tipoLocal: vaga.tipoLocal,
+                    empresa: vaga.empresa,
+                    cidade: vaga.cidade,
+                    salario: vaga.salario,
                     contrato: vaga.contrato,
+                    horario: vaga.horario,
+                    beneficios: vaga.beneficios,
                     descricao: vaga.descricao,
                     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } else {
                 await this.vagasCollection.add({
                     titulo: vaga.titulo,
-                    localizacao: vaga.localizacao,
-                    tipoLocal: vaga.tipoLocal,
+                    empresa: vaga.empresa,
+                    cidade: vaga.cidade,
+                    salario: vaga.salario,
                     contrato: vaga.contrato,
+                    horario: vaga.horario,
+                    beneficios: vaga.beneficios,
                     descricao: vaga.descricao,
                     ativa: true,
                     criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
@@ -121,9 +127,9 @@ class VagasManager {
         const vagasAtivas = this.vagas.filter(v => v.ativa !== false).length;
         document.getElementById('vagas-ativas').textContent = vagasAtivas;
 
-        // Vagas remotas
-        const vagasRemotas = this.vagas.filter(v => v.tipoLocal === 'remoto').length;
-        document.getElementById('vagas-remotas').textContent = vagasRemotas;
+        // Vagas CLT
+        const vagasCLT = this.vagas.filter(v => v.contrato === 'clt').length;
+        document.getElementById('vagas-remotas').textContent = vagasCLT;
 
         // Vagas criadas este mês
         const dataAtual = new Date();
@@ -178,16 +184,18 @@ class VagasManager {
     }
 
     renderizarDistribuicao() {
-        const localizacoes = {
-            'Remoto': 0,
-            'Híbrido': 0,
-            'Presencial': 0
+        const contratos = {
+            'CLT': 0,
+            'PJ': 0,
+            'Estágio': 0,
+            'Temporário': 0,
+            'Freelancer': 0
         };
 
         this.vagas.forEach(vaga => {
-            const tipo = vaga.tipoLocal.charAt(0).toUpperCase() + vaga.tipoLocal.slice(1);
-            if (localizacoes.hasOwnProperty(tipo)) {
-                localizacoes[tipo]++;
+            const tipo = this.formatarContrato(vaga.contrato);
+            if (contratos.hasOwnProperty(tipo)) {
+                contratos[tipo]++;
             }
         });
 
@@ -196,12 +204,14 @@ class VagasManager {
         
         // Cores laranja para cada tipo
         const cores = {
-            'Remoto': 'linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%)',
-            'Híbrido': 'linear-gradient(135deg, #ff8c42 0%, #ffb347 100%)',
-            'Presencial': 'linear-gradient(135deg, #ffb347 0%, #ffd166 100%)'
+            'CLT': 'linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%)',
+            'PJ': 'linear-gradient(135deg, #ff8c42 0%, #ffb347 100%)',
+            'Estágio': 'linear-gradient(135deg, #ffb347 0%, #ffd166 100%)',
+            'Temporário': 'linear-gradient(135deg, #ffd166 0%, #ffe066 100%)',
+            'Freelancer': 'linear-gradient(135deg, #ffe066 0%, #fff4a3 100%)'
         };
         
-        container.innerHTML = Object.entries(localizacoes).map(([tipo, count]) => {
+        container.innerHTML = Object.entries(contratos).map(([tipo, count]) => {
             const porcentagem = Math.round((count / total) * 100);
             return `
                 <div class="distribution-item">
@@ -243,8 +253,8 @@ class VagasManager {
                 <thead>
                     <tr>
                         <th>TÍTULO</th>
-                        <th>LOCALIZAÇÃO</th>
-                        <th>TIPO</th>
+                        <th>CIDADE</th>
+                        <th>SALÁRIO</th>
                         <th>CONTRATO</th>
                         <th>STATUS</th>
                         <th>CRIADA EM</th>
@@ -255,8 +265,8 @@ class VagasManager {
                     ${vagas.map(vaga => `
                         <tr>
                             <td><strong>${vaga.titulo}</strong></td>
-                            <td>${vaga.localizacao}</td>
-                            <td><span class="type-badge ${vaga.tipoLocal}">${this.formatarTipo(vaga.tipoLocal)}</span></td>
+                            <td>${vaga.cidade || vaga.localizacao || 'N/A'}</td>
+                            <td>${vaga.salario || 'A combinar'}</td>
                             <td>${this.formatarContrato(vaga.contrato)}</td>
                             <td><span class="status-badge ${vaga.ativa !== false ? 'active' : 'inactive'}">${vaga.ativa !== false ? 'Ativa' : 'Inativa'}</span></td>
                             <td>${this.formatarData(vaga.criadoEm)}</td>
@@ -301,28 +311,22 @@ class VagasManager {
         const termoLower = termo.toLowerCase();
         const vagasFiltradas = this.vagas.filter(vaga => 
             vaga.titulo.toLowerCase().includes(termoLower) ||
-            vaga.localizacao.toLowerCase().includes(termoLower) ||
-            vaga.contrato.toLowerCase().includes(termoLower) ||
-            vaga.tipoLocal.toLowerCase().includes(termoLower)
+            (vaga.cidade && vaga.cidade.toLowerCase().includes(termoLower)) ||
+            (vaga.localizacao && vaga.localizacao.toLowerCase().includes(termoLower)) ||
+            (vaga.salario && vaga.salario.toLowerCase().includes(termoLower)) ||
+            vaga.contrato.toLowerCase().includes(termoLower)
         );
 
         this.renderizarTabela(vagasFiltradas);
-    }
-
-    formatarTipo(tipo) {
-        const tipos = {
-            'remoto': 'Remoto',
-            'hibrido': 'Híbrido',
-            'presencial': 'Presencial'
-        };
-        return tipos[tipo] || tipo;
     }
 
     formatarContrato(contrato) {
         const contratos = {
             'clt': 'CLT',
             'pj': 'PJ',
-            'estagio': 'Estágio'
+            'estagio': 'Estágio',
+            'temporario': 'Temporário',
+            'freelancer': 'Freelancer'
         };
         return contratos[contrato] || contrato;
     }
@@ -339,21 +343,32 @@ class VagasManager {
 
     salvarVaga() {
         const titulo = document.getElementById('vaga-titulo').value.trim();
-        const localizacao = document.getElementById('vaga-localizacao').value.trim();
-        const tipoLocal = document.getElementById('vaga-tipo-local').value;
+        const empresa = document.getElementById('vaga-empresa').value.trim();
+        const cidade = document.getElementById('vaga-cidade').value.trim();
+        const salario = document.getElementById('vaga-salario').value.trim();
         const contrato = document.getElementById('vaga-contrato').value;
+        const horario = document.getElementById('vaga-horario').value.trim();
         const descricao = document.getElementById('vaga-descricao').value.trim();
 
-        if (!titulo || !localizacao || !tipoLocal || !contrato) {
+        // Capturar benefícios selecionados
+        const beneficios = [];
+        document.querySelectorAll('.benefit-checkbox:checked').forEach(checkbox => {
+            beneficios.push(checkbox.value);
+        });
+
+        if (!titulo || !cidade || !contrato) {
             alert('Por favor, preencha todos os campos obrigatórios.');
             return;
         }
 
         const vaga = {
             titulo,
-            localizacao,
-            tipoLocal,
+            empresa,
+            cidade,
+            salario,
             contrato,
+            horario,
+            beneficios,
             descricao
         };
 
@@ -398,10 +413,30 @@ class VagasManager {
             document.getElementById('modal-titulo').textContent = 'Editar Vaga';
             document.getElementById('vaga-id').value = vaga.id;
             document.getElementById('vaga-titulo').value = vaga.titulo;
-            document.getElementById('vaga-localizacao').value = vaga.localizacao;
-            document.getElementById('vaga-tipo-local').value = vaga.tipoLocal;
+            document.getElementById('vaga-empresa').value = vaga.empresa || '';
+            document.getElementById('vaga-cidade').value = vaga.cidade || vaga.localizacao || '';
+            document.getElementById('vaga-salario').value = vaga.salario || '';
             document.getElementById('vaga-contrato').value = vaga.contrato;
+            document.getElementById('vaga-horario').value = vaga.horario || '';
             document.getElementById('vaga-descricao').value = vaga.descricao || '';
+            
+            // Limpar benefícios
+            document.querySelectorAll('.benefit-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Marcar benefícios salvos
+            if (vaga.beneficios && Array.isArray(vaga.beneficios)) {
+                vaga.beneficios.forEach(beneficio => {
+                    const checkbox = Array.from(document.querySelectorAll('.benefit-checkbox')).find(
+                        cb => cb.value === beneficio
+                    );
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+            
             this.vagaEditandoId = vaga.id;
             
             document.getElementById('modal-vaga').classList.add('show');

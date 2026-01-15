@@ -850,6 +850,39 @@
             min-height: 100px;
         }
 
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .benefit-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        .benefit-checkbox:checked {
+            background-color: var(--primary-color);
+        }
+
+        .benefit-label {
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+        }
+
         .modal-footer {
             padding: 20px 24px;
             border-top: 1px solid var(--border-color);
@@ -1188,17 +1221,16 @@
                         <input type="text" class="form-input" id="vaga-titulo" required placeholder="Ex: Desenvolvedor Backend Sênior">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Localização *</label>
-                        <input type="text" class="form-input" id="vaga-localizacao" required placeholder="Ex: São Paulo, SP">
+                        <label class="form-label">Empresa</label>
+                        <input type="text" class="form-input" id="vaga-empresa" placeholder="Ex: Empresa XYZ (deixe vazio para não exibir)">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Tipo de Local *</label>
-                        <select class="form-select" id="vaga-tipo-local" required>
-                            <option value="">Selecione...</option>
-                            <option value="remoto">Remoto</option>
-                            <option value="hibrido">Híbrido</option>
-                            <option value="presencial">Presencial</option>
-                        </select>
+                        <label class="form-label">Cidade *</label>
+                        <input type="text" class="form-input" id="vaga-cidade" required placeholder="Ex: São Paulo, SP">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Salário</label>
+                        <input type="text" class="form-input" id="vaga-salario" placeholder="Ex: R$ 5.000,00 - R$ 8.000,00">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tipo de Contrato *</label>
@@ -1207,11 +1239,70 @@
                             <option value="clt">CLT</option>
                             <option value="pj">PJ</option>
                             <option value="estagio">Estágio</option>
+                            <option value="temporario">Temporário</option>
+                            <option value="freelancer">Freelancer</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Descrição</label>
-                        <textarea class="form-textarea" id="vaga-descricao" placeholder="Descreva os requisitos e responsabilidades..."></textarea>
+                        <label class="form-label">Horário</label>
+                        <input type="text" class="form-input" id="vaga-horario" placeholder="Ex: Segunda a Sexta, 9h às 18h">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Benefícios</label>
+                        <div class="benefits-grid">
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-va" value="Vale Alimentação">
+                                <label class="benefit-label" for="benefit-va">Vale Alimentação</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-vr" value="Vale Refeição">
+                                <label class="benefit-label" for="benefit-vr">Vale Refeição</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-vt" value="Vale Transporte">
+                                <label class="benefit-label" for="benefit-vt">Vale Transporte</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-saude" value="Plano de Saúde">
+                                <label class="benefit-label" for="benefit-saude">Plano de Saúde</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-odonto" value="Plano Odontológico">
+                                <label class="benefit-label" for="benefit-odonto">Plano Odontológico</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-seguro" value="Seguro de Vida">
+                                <label class="benefit-label" for="benefit-seguro">Seguro de Vida</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-home" value="Home Office">
+                                <label class="benefit-label" for="benefit-home">Home Office</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-flex" value="Horário Flexível">
+                                <label class="benefit-label" for="benefit-flex">Horário Flexível</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-edu" value="Auxílio Educação">
+                                <label class="benefit-label" for="benefit-edu">Auxílio Educação</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-dayoff" value="Day Off">
+                                <label class="benefit-label" for="benefit-dayoff">Day Off</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-gym" value="Gympass">
+                                <label class="benefit-label" for="benefit-gym">Gympass</label>
+                            </div>
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox" id="benefit-plr" value="Participação nos Lucros">
+                                <label class="benefit-label" for="benefit-plr">Participação nos Lucros</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descrição da Vaga</label>
+                        <textarea class="form-textarea" id="vaga-descricao" placeholder="Descreva os requisitos, responsabilidades e outros detalhes da vaga..."></textarea>
                     </div>
                     <input type="hidden" id="vaga-id">
                     <input type="hidden" id="vaga-ativa" value="true">
@@ -1270,22 +1361,27 @@
             document.getElementById('modal-titulo').textContent = 'Nova Vaga';
             document.getElementById('form-vaga').reset();
             document.getElementById('vaga-id').value = '';
+            // Limpar todos os checkboxes de benefícios
+            document.querySelectorAll('.benefit-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
             modal.classList.add('show');
         });
 
+        // Botão cancelar apenas limpa o formulário, não fecha o modal
         btnCancelar.addEventListener('click', () => {
-            modal.classList.remove('show');
+            if (confirm('Deseja realmente cancelar? Os dados preenchidos serão perdidos.')) {
+                modal.classList.remove('show');
+            }
         });
 
+        // Apenas o X fecha o modal
         btnClose.addEventListener('click', () => {
             modal.classList.remove('show');
         });
 
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('show');
-            }
-        });
+        // Remover o evento de clicar fora do modal
+        // (comentado para não fechar ao clicar no backdrop)
     </script>
 </body>
 </html>
