@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview - Email Effore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 40px 20px;
+            margin: 0;
+        }
+        .preview-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .email-preview {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .tab:hover {
+            background: #fff;
+        }
+        .tab.active {
+            background: #fff;
+            color: #fd8625;
+            border-bottom: 3px solid #fd8625;
+        }
+        .email-content {
+            display: none;
+            padding: 20px;
+            background: #ffffff;
+        }
+        .email-content.active {
+            display: block;
+        }
+        .info-box {
+            background: #fff3e6;
+            border-left: 4px solid #fd8625;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info-box strong {
+            color: #fd8625;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <h1>📧 Preview dos Emails - Effore</h1>
+        <p class="subtitle">Veja como seus clientes receberão os emails personalizados</p>
+
+        <div class="info-box">
+            <strong>ℹ️ Informação:</strong> Estes são os templates HTML que serão enviados automaticamente quando alguém preencher os formulários do seu site.
+        </div>
+
+        <div class="email-preview">
+            <div class="tabs">
+                <button class="tab active" onclick="showEmail('contato')">💬 Contato</button>
+                <button class="tab" onclick="showEmail('empresa')">🏢 Empresa</button>
+                <button class="tab" onclick="showEmail('candidatura')">🎯 Candidatura</button>
+            </div>
+
+            <!-- Email de Contato -->
+            <div id="contato" class="email-content active">
+                <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9;">
+                    <table style="width: 100%; border-collapse: collapse; background-color: #f9f9f9;">
+                        <tr>
+                            <td style="padding: 30px; background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%); text-align: center;">
+                                <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Effore Recrutamento</h1>
+                                <p style="color: #fd8625; margin: 10px 0 0 0; font-size: 14px; font-weight: 500;">Conectando Talentos às Oportunidades</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #ffffff;">
+                                <h2 style="color: #fd8625; margin-bottom: 20px; font-size: 24px;">💬 Nova Mensagem de Contato</h2>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Nome:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">João Silva</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Email:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">joao.silva@example.com</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Mensagem:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">Gostaria de mais informações sobre os serviços de recrutamento.</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #ffffff; border-top: 1px solid #eee;">
+                                <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">
+                                    <strong style="color: #1a1a1a;">📅 Data/Hora:</strong> 24 de novembro de 2025 às 14:30
+                                </p>
+                                <p style="margin: 0; color: #666; font-size: 14px;">
+                                    <strong style="color: #1a1a1a;">🌐 Origem:</strong> /pages/contato
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #1a1a1a; text-align: center;">
+                                <p style="color: #ffffff; margin: 0 0 10px 0; font-size: 14px; font-weight: 500;">Entre em contato:</p>
+                                <p style="color: #fd8625; margin: 0; font-size: 13px;">
+                                    📞 (11) 4029-0828 | 📱 (11) 98372-0548<br>
+                                    📧 efforerecrutamentoeselecao@gmail.com
+                                </p>
+                                <p style="color: #888; margin: 15px 0 0 0; font-size: 12px;">
+                                    © 2025 Effore Recrutamento e Seleção
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Email de Empresa -->
+            <div id="empresa" class="email-content">
+                <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9;">
+                    <table style="width: 100%; border-collapse: collapse; background-color: #f9f9f9;">
+                        <tr>
+                            <td style="padding: 30px; background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%); text-align: center;">
+                                <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Effore Recrutamento</h1>
+                                <p style="color: #fd8625; margin: 10px 0 0 0; font-size: 14px; font-weight: 500;">Conectando Talentos às Oportunidades</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #ffffff;">
+                                <h2 style="color: #fd8625; margin-bottom: 20px; font-size: 24px;">🏢 Nova Empresa Interessada</h2>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Nome do Contato:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">Maria Santos</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Empresa:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">TechCorp Brasil</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Email Corporativo:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">maria.santos@techcorp.com.br</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Desafio/Necessidade:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">Precisamos contratar 5 desenvolvedores seniores para projeto estratégico.</td>
+                                    </tr>
+                                </table>
+                                <div style="margin-top: 20px; padding: 15px; background-color: #fff3e6; border-left: 4px solid #fd8625; border-radius: 4px;">
+                                    <p style="margin: 0; color: #1a1a1a; font-weight: 500;">⚡ Ação Recomendada: Entrar em contato em até 2 horas úteis</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #ffffff; border-top: 1px solid #eee;">
+                                <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">
+                                    <strong style="color: #1a1a1a;">📅 Data/Hora:</strong> 24 de novembro de 2025 às 14:30
+                                </p>
+                                <p style="margin: 0; color: #666; font-size: 14px;">
+                                    <strong style="color: #1a1a1a;">🌐 Origem:</strong> /pages/para-empresa
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #1a1a1a; text-align: center;">
+                                <p style="color: #ffffff; margin: 0 0 10px 0; font-size: 14px; font-weight: 500;">Entre em contato:</p>
+                                <p style="color: #fd8625; margin: 0; font-size: 13px;">
+                                    📞 (11) 4029-0828 | 📱 (11) 98372-0548<br>
+                                    📧 efforerecrutamentoeselecao@gmail.com
+                                </p>
+                                <p style="color: #888; margin: 15px 0 0 0; font-size: 12px;">
+                                    © 2025 Effore Recrutamento e Seleção
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Email de Candidatura -->
+            <div id="candidatura" class="email-content">
+                <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9;">
+                    <table style="width: 100%; border-collapse: collapse; background-color: #f9f9f9;">
+                        <tr>
+                            <td style="padding: 30px; background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%); text-align: center;">
+                                <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Effore Recrutamento</h1>
+                                <p style="color: #fd8625; margin: 10px 0 0 0; font-size: 14px; font-weight: 500;">Conectando Talentos às Oportunidades</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #ffffff;">
+                                <h2 style="color: #fd8625; margin-bottom: 20px; font-size: 24px;">🎯 Nova Candidatura</h2>
+                                <div style="margin-bottom: 20px; padding: 15px; background-color: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 4px;">
+                                    <p style="margin: 0; color: #1a1a1a; font-weight: 600; font-size: 16px;">Vaga: Desenvolvedor Full Stack Sênior</p>
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Nome:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">Carlos Oliveira</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Email:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">carlos.oliveira@email.com</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Telefone:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">(11) 98765-4321</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">LinkedIn:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;"><a href="https://linkedin.com/in/carlosoliveira" style="color: #fd8625;">linkedin.com/in/carlosoliveira</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Currículo:</strong></td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">Link para currículo</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #ffffff; border-top: 1px solid #eee;">
+                                <p style="margin: 0 0 10px 0; color: #666; font-size: 14px;">
+                                    <strong style="color: #1a1a1a;">📅 Data/Hora:</strong> 24 de novembro de 2025 às 14:30
+                                </p>
+                                <p style="margin: 0; color: #666; font-size: 14px;">
+                                    <strong style="color: #1a1a1a;">🌐 Origem:</strong> /pages/vagas
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 30px; background-color: #1a1a1a; text-align: center;">
+                                <p style="color: #ffffff; margin: 0 0 10px 0; font-size: 14px; font-weight: 500;">Entre em contato:</p>
+                                <p style="color: #fd8625; margin: 0; font-size: 13px;">
+                                    📞 (11) 4029-0828 | 📱 (11) 98372-0548<br>
+                                    📧 efforerecrutamentoeselecao@gmail.com
+                                </p>
+                                <p style="color: #888; margin: 15px 0 0 0; font-size: 12px;">
+                                    © 2025 Effore Recrutamento e Seleção
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>📋 Próximo Passo:</strong> Siga as instruções em <code>CONFIGURAR-EMAILJS.md</code> para ativar o envio de emails.
+        </div>
+    </div>
+
+    <script>
+        function showEmail(tipo) {
+            // Remover active de todas as tabs e conteúdos
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.email-content').forEach(content => content.classList.remove('active'));
+            
+            // Adicionar active no clicado
+            event.target.classList.add('active');
+            document.getElementById(tipo).classList.add('active');
+        }
+    </script>
+</body>
+</html>

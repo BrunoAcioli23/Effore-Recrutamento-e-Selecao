@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Backend - Effore</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .config {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .config label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .config input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-contato { background: #fd8625; }
+        .btn-empresa { background: #10b981; }
+        .btn-candidatura { background: #3b82f6; }
+        .resultado {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+        .resultado.show {
+            display: block;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+            display: block;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste do Backend</h1>
+        <p class="subtitle">Teste o envio de emails via Firebase Functions</p>
+
+        <div class="config">
+            <label>🌐 URL da Cloud Function:</label>
+            <input type="text" id="functionUrl" placeholder="https://us-central1-SEU-PROJECT.cloudfunctions.net/enviarEmail">
+            <small style="color: #666; display: block; margin-top: 5px;">
+                Cole a URL da sua Firebase Function aqui
+            </small>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="buttons">
+            <button class="btn-contato" onclick="testarContato()">
+                💬<br>Contato
+            </button>
+            <button class="btn-empresa" onclick="testarEmpresa()">
+                🏢<br>Empresa
+            </button>
+            <button class="btn-candidatura" onclick="testarCandidatura()">
+                🎯<br>Candidatura
+            </button>
+        </div>
+
+        <div class="resultado" id="resultado"></div>
+    </div>
+
+    <script>
+        const resultado = document.getElementById('resultado');
+        const status = document.getElementById('status');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            resultado.textContent += `[${timestamp}] ${message}\n`;
+            resultado.scrollTop = resultado.scrollHeight;
+        }
+
+        async function testar(tipo, dados) {
+            const functionUrl = document.getElementById('functionUrl').value.trim();
+            
+            if (!functionUrl) {
+                alert('❌ Por favor, insira a URL da Cloud Function!');
+                return;
+            }
+
+            resultado.classList.add('show');
+            status.className = 'status';
+            resultado.textContent = '';
+            
+            log(`🚀 Iniciando teste: ${tipo}`);
+            log(`📡 URL: ${functionUrl}`);
+            log(`📦 Dados: ${JSON.stringify(dados, null, 2)}`);
+            log('');
+            log('⏳ Enviando...');
+            
+            try {
+                const response = await fetch(functionUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tipo, ...dados })
+                });
+                
+                log(`📥 Status: ${response.status} ${response.statusText}`);
+                
+                const result = await response.json();
+                log('📄 Resposta:');
+                log(JSON.stringify(result, null, 2));
+                
+                if (result.success) {
+                    log('');
+                    log('✅ EMAIL ENVIADO COM SUCESSO!');
+                    log('📬 Verifique sua caixa de entrada');
+                    status.className = 'status success';
+                    status.textContent = '✅ Email enviado! Verifique sua caixa de entrada.';
+                } else {
+                    throw new Error(result.message || 'Erro desconhecido');
+                }
+                
+            } catch (error) {
+                log('');
+                log('❌ ERRO:');
+                log(error.message);
+                status.className = 'status error';
+                status.textContent = '❌ Erro: ' + error.message;
+            }
+        }
+
+        function testarContato() {
+            testar('contato', {
+                nome: 'João Silva Teste',
+                email: 'joao.teste@example.com',
+                mensagem: 'Esta é uma mensagem de teste do sistema de contato.\n\nEstamos validando o envio de emails via Firebase Functions.'
+            });
+        }
+
+        function testarEmpresa() {
+            testar('empresa', {
+                nome: 'Maria Santos Teste',
+                email: 'maria.teste@empresa.com.br',
+                empresa: 'TechCorp Brasil Ltda',
+                mensagem: 'Precisamos contratar 5 desenvolvedores full stack com experiência em Node.js e React.\n\nUrgente para projeto estratégico.'
+            });
+        }
+
+        function testarCandidatura() {
+            testar('candidatura', {
+                nome: 'Carlos Oliveira Teste',
+                email: 'carlos.teste@email.com',
+                telefone: '(11) 98765-4321',
+                vaga: 'Desenvolvedor Full Stack Sênior',
+                linkedin: 'https://linkedin.com/in/carlos-oliveira-teste',
+                curriculo: 'curriculo-carlos-oliveira.pdf'
+            });
+        }
+
+        // Carregar URL salva (se houver)
+        const savedUrl = localStorage.getItem('functionUrl');
+        if (savedUrl) {
+            document.getElementById('functionUrl').value = savedUrl;
+        }
+
+        // Salvar URL quando alterada
+        document.getElementById('functionUrl').addEventListener('change', (e) => {
+            localStorage.setItem('functionUrl', e.target.value);
+        });
+    </script>
+</body>
+</html>
