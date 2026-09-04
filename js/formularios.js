@@ -129,7 +129,7 @@ async function enviarFormulario(form, tipo) {
 // INICIALIZAÇÃO AUTOMÁTICA
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Inicializando formulários Effore com Firebase Functions...');
+    console.log('🚀 Inicializando formulários Império com Firebase Functions...');
     console.log('📧 Backend Status:', BACKEND_CONFIG.enabled ? '✅ Ativado' : '❌ Desativado');
     console.log('🌐 Function URL:', BACKEND_CONFIG.functionURL);
     

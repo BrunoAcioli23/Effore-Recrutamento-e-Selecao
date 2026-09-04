@@ -8,13 +8,13 @@
 :root {
     /* Paleta de Cores Baseada no Logo */
     --color-black: #1a1a1a; /* Um preto um pouco mais suave que o #000 */
-    --color-orange: #fd8625;  /* O cinza do logo */
+    --color-orange: #A78652;  /* O cinza do logo */
     --color-white: #FFFFFF;
     --color-bg-light: #f9f9f9; /* Um cinza bem claro para fundos de seção */
 
     /* Aliases para componentes */
-    --color-primary: #fd8625;
-    --color-primary-dark: #e67419;
+    --color-primary: #d7b071;
+    --color-primary-dark: #A78652 ;
 
     /* Fontes */
     --font-primary: 'Poppins', sans-serif;
@@ -33,7 +33,7 @@
   background: 
     linear-gradient(to bottom,
       #ffffff 20%,
-      #fd8625 100%
+      #A78652 100%
     );
 }
 
@@ -57,7 +57,7 @@ body::before {
   height: 100vh;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(45deg, #fd8625, #fff, #fd8625);
+  background: linear-gradient(45deg, #A78652, #fff, #A78652);
   background-size: 200% 200%;
   animation: degradeAnimado 10s ease infinite;
   opacity: 0.05;
@@ -73,7 +73,7 @@ body::before {
 .header {
     background-color: var(--color-white);
     border-bottom: 1px solid #eee;
-    padding: 15px 0;
+    padding: 5px 0 0 0;
     position: sticky;
     top: 0;
     width: 100%;

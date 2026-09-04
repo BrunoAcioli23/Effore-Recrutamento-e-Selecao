@@ -94,7 +94,7 @@ class HomeVagasDisplay {
             let beneficiosHTML = '';
             if (vaga.beneficios && vaga.beneficios.length > 0) {
                 const beneficiosLista = vaga.beneficios.slice(0, 3).map(b => 
-                    `<span style="display: inline-block; background: #fff4e6; color: #ff6b35; padding: 4px 10px; border-radius: 12px; font-size: 10px; margin-right: 5px; margin-bottom: 5px; font-weight: 500;">${b}</span>`
+                    `<span style="display: inline-block; background: #fff4e6; color: #A78652 ; padding: 4px 10px; border-radius: 12px; font-size: 10px; margin-right: 5px; margin-bottom: 5px; font-weight: 500;">${b}</span>`
                 ).join('');
                 const maisInfo = vaga.beneficios.length > 3 ? `<span style="font-size: 10px; color: #999; font-weight: 600;">+${vaga.beneficios.length - 3} mais</span>` : '';
                 beneficiosHTML = `<div style="margin-top: 10px;">
@@ -110,15 +110,15 @@ class HomeVagasDisplay {
                         
                         <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-money-bill-wave" style="color: #ff6b35; font-size: 12px; width: 16px;"></i>
-                                <span style="font-size: 14px; color: #ff6b35; font-weight: 700;">${salario}</span>
+                                <i class="fas fa-money-bill-wave" style="color: #A78652; font-size: 12px; width: 16px;"></i>
+                                <span style="font-size: 14px; color: #A78652; font-weight: 700;">${salario}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-briefcase" style="color: #ff6b35; font-size: 12px; width: 16px;"></i>
+                                <i class="fas fa-briefcase" style="color: #A78652; font-size: 12px; width: 16px;"></i>
                                 <span style="font-size: 14px; color: #333; font-weight: 600;">${contrato}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-map-marker-alt" style="color: #ff6b35; font-size: 12px; width: 16px;"></i>
+                                <i class="fas fa-map-marker-alt" style="color: #A78652; font-size: 12px; width: 16px;"></i>
                                 <span style="font-size: 14px; color: #333; font-weight: 600;">${cidade}</span>
                             </div>
                         </div>

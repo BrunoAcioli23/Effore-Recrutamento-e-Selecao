@@ -83,7 +83,7 @@ function gerarEmailHTML(formData, tipo) {
         conteudoEspecifico = `
             <tr>
                 <td style="padding: 20px 30px; background-color: #ffffff;">
-                    <h2 style="color: #fd8625; margin-bottom: 20px; font-size: 24px;">💬 Nova Mensagem de Contato</h2>
+                    <h2 style="color: #A78652; margin-bottom: 20px; font-size: 24px;">💬 Nova Mensagem de Contato</h2>
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Nome:</strong></td>
@@ -107,7 +107,7 @@ function gerarEmailHTML(formData, tipo) {
         conteudoEspecifico = `
             <tr>
                 <td style="padding: 20px 30px; background-color: #ffffff;">
-                    <h2 style="color: #fd8625; margin-bottom: 20px; font-size: 24px;">🏢 Nova Empresa Interessada</h2>
+                    <h2 style="color: #A78652; margin-bottom: 20px; font-size: 24px;">🏢 Nova Empresa Interessada</h2>
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Nome do Contato:</strong></td>
@@ -140,7 +140,7 @@ function gerarEmailHTML(formData, tipo) {
         conteudoEspecifico = `
             <tr>
                 <td style="padding: 20px 30px; background-color: #ffffff;">
-                    <h2 style="color: #fd8625; margin-bottom: 20px; font-size: 24px;">🎯 Nova Candidatura</h2>
+                    <h2 style="color: #A78652; margin-bottom: 20px; font-size: 24px;">🎯 Nova Candidatura</h2>
                     <div style="margin-bottom: 20px; padding: 15px; background-color: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 4px;">
                         <p style="margin: 0; color: #1a1a1a; font-weight: 600; font-size: 16px;">Vaga: ${vaga}</p>
                     </div>
@@ -159,13 +159,13 @@ function gerarEmailHTML(formData, tipo) {
                         </tr>
                         <tr>
                             <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">LinkedIn:</strong></td>
-                            <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">${linkedin !== 'Não informado' ? `<a href="${linkedin}" style="color: #fd8625;">${linkedin}</a>` : linkedin}</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">${linkedin !== 'Não informado' ? `<a href="${linkedin}" style="color: #A78652;">${linkedin}</a>` : linkedin}</td>
                         </tr>
                         <tr>
                             <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong style="color: #1a1a1a;">Currículo:</strong></td>
                             <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">${curriculo}</td>
                         </tr>
-                           © 2025 Effore Recrutamento e Seleção
+                           © 2025 Imperio Recursos Humanos
                         </p>
                     </td>
                 </tr>
@@ -287,7 +287,7 @@ async function enviarFormulario(form, tipo) {
 // INICIALIZAÇÃO AUTOMÁTICA
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Inicializando formulários Effore com Firebase Functions...');
+    console.log('🚀 Inicializando formulários Império com Firebase Functions...');
     console.log('📧 Backend Status:', BACKEND_CONFIG.enabled ? '✅ Ativado' : '❌ Desativado');
     console.log('🌐 Function URL:', BACKEND_CONFIG.functionURL);
     

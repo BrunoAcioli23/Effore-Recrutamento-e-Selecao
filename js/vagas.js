@@ -104,7 +104,7 @@ class VagasDisplay {
             let beneficiosHTML = '';
             if (vaga.beneficios && vaga.beneficios.length > 0) {
                 const beneficiosLista = vaga.beneficios.map(b => 
-                    `<span style="display: inline-block; background: #fff4e6; color: #ff6b35; padding: 5px 12px; border-radius: 15px; font-size: 11px; margin-right: 6px; margin-bottom: 6px; font-weight: 500;">${b}</span>`
+                    `<span style="display: inline-block; background: #fff4e6; color: #A78652; padding: 5px 12px; border-radius: 15px; font-size: 11px; margin-right: 6px; margin-bottom: 6px; font-weight: 500;">${b}</span>`
                 ).join('');
                 beneficiosHTML = `<div style="margin-top: 12px;">
                     <div style="font-size: 12px; color: #999; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Benefícios</div>
@@ -119,15 +119,15 @@ class VagasDisplay {
                         
                         <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-bottom: 4px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-money-bill-wave" style="color: #ff6b35; font-size: 14px; width: 20px;"></i>
+                                <i class="fas fa-money-bill-wave" style="color: #A78652; font-size: 14px; width: 20px;"></i>
                                 <div>
                                     <div style="font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Salário</div>
-                                    <div style="font-size: 15px; color: #ff6b35; font-weight: 700;">${salario}</div>
+                                    <div style="font-size: 15px; color: #A78652; font-weight: 700;">${salario}</div>
                                 </div>
                             </div>
                             
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-briefcase" style="color: #ff6b35; font-size: 14px; width: 20px;"></i>
+                                <i class="fas fa-briefcase" style="color: #A78652; font-size: 14px; width: 20px;"></i>
                                 <div>
                                     <div style="font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Contrato</div>
                                     <div style="font-size: 15px; color: #333; font-weight: 600;">${contrato}</div>
@@ -135,7 +135,7 @@ class VagasDisplay {
                             </div>
                             
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-map-marker-alt" style="color: #ff6b35; font-size: 14px; width: 20px;"></i>
+                                <i class="fas fa-map-marker-alt" style="color: #A78652; font-size: 14px; width: 20px;"></i>
                                 <div>
                                     <div style="font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Localização</div>
                                     <div style="font-size: 15px; color: #333; font-weight: 600;">${cidade}</div>
@@ -237,7 +237,7 @@ function abrirModalDetalhes(vagaId) {
     if (vaga.empresa && vaga.empresa.trim()) {
         empresaNome.textContent = vaga.empresa;
     } else {
-        empresaNome.textContent = 'Effore Recrutamento e Seleção';
+        empresaNome.textContent = 'Imperio Recursos Humanos';
     }
     
     document.getElementById('modal-salario').textContent = salario;
@@ -268,7 +268,7 @@ function abrirModalDetalhes(vagaId) {
     if (vaga.beneficios && vaga.beneficios.length > 0) {
         beneficiosContainer.style.display = 'block';
         beneficiosDiv.innerHTML = vaga.beneficios.map(b => 
-            `<span style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #fff4e6 0%, #ffe8d1 100%); color: #ff6b35; padding: 10px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; border: 2px solid #ffd9b8;">
+            `<span style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #fff4e6 0%, #ffe8d1 100%); color: #A78652; padding: 10px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; border: 2px solid #a7865223;">
                 <i class="fas fa-check-circle" style="margin-right: 8px;"></i> ${b}
             </span>`
         ).join('');
