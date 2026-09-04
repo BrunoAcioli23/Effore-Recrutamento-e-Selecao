@@ -202,13 +202,13 @@ class VagasManager {
         const total = this.vagas.length || 1;
         const container = document.getElementById('distribuicao-localizacao');
         
-        // Cores laranja para cada tipo
+        // Escala sequencial do dourado da marca (do bronze ao dourado claro)
         const cores = {
-            'CLT': 'linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%)',
-            'PJ': 'linear-gradient(135deg, #ff8c42 0%, #ffb347 100%)',
-            'Estágio': 'linear-gradient(135deg, #ffb347 0%, #ffd166 100%)',
-            'Temporário': 'linear-gradient(135deg, #ffd166 0%, #ffe066 100%)',
-            'Freelancer': 'linear-gradient(135deg, #ffe066 0%, #fff4a3 100%)'
+            'CLT': 'linear-gradient(135deg, #5F4A2A 0%, #7A5F37 100%)',
+            'PJ': 'linear-gradient(135deg, #7A5F37 0%, #96784A 100%)',
+            'Estágio': 'linear-gradient(135deg, #96784A 0%, #A78652 100%)',
+            'Temporário': 'linear-gradient(135deg, #A78652 0%, #C29A5E 100%)',
+            'Freelancer': 'linear-gradient(135deg, #C29A5E 0%, #D7B071 100%)'
         };
         
         container.innerHTML = Object.entries(contratos).map(([tipo, count]) => {

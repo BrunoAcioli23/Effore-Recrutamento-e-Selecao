@@ -65,7 +65,7 @@ class HomeVagasDisplay {
 
         if (this.vagas.length === 0) {
             homeVagasList.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #666;">
+                <div style="text-align: center; padding: 40px; color: #5C6673;">
                     <p>Nenhuma vaga disponível no momento.</p>
                     <p style="margin-top: 10px;">Cadastre-se em nosso banco de talentos para ser avisado quando novas oportunidades surgirem!</p>
                 </div>
@@ -94,11 +94,11 @@ class HomeVagasDisplay {
             let beneficiosHTML = '';
             if (vaga.beneficios && vaga.beneficios.length > 0) {
                 const beneficiosLista = vaga.beneficios.slice(0, 3).map(b => 
-                    `<span style="display: inline-block; background: #fff4e6; color: #A78652 ; padding: 4px 10px; border-radius: 12px; font-size: 10px; margin-right: 5px; margin-bottom: 5px; font-weight: 500;">${b}</span>`
+                    `<span style="display: inline-block; background: #F5EFE3; color: #7A5F37; padding: 4px 10px; border-radius: 12px; font-size: 10px; margin-right: 5px; margin-bottom: 5px; font-weight: 500;">${b}</span>`
                 ).join('');
-                const maisInfo = vaga.beneficios.length > 3 ? `<span style="font-size: 10px; color: #999; font-weight: 600;">+${vaga.beneficios.length - 3} mais</span>` : '';
+                const maisInfo = vaga.beneficios.length > 3 ? `<span style="font-size: 10px; color: #5C6673; font-weight: 600;">+${vaga.beneficios.length - 3} mais</span>` : '';
                 beneficiosHTML = `<div style="margin-top: 10px;">
-                    <div style="font-size: 10px; color: #999; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Benefícios</div>
+                    <div style="font-size: 10px; color: #5C6673; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Benefícios</div>
                     <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 3px;">${beneficiosLista}${maisInfo}</div>
                 </div>`;
             }
@@ -111,15 +111,15 @@ class HomeVagasDisplay {
                         <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-money-bill-wave" style="color: #A78652; font-size: 12px; width: 16px;"></i>
-                                <span style="font-size: 14px; color: #A78652; font-weight: 700;">${salario}</span>
+                                <span style="font-size: 14px; color: #7A5F37; font-weight: 700;">${salario}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-briefcase" style="color: #A78652; font-size: 12px; width: 16px;"></i>
-                                <span style="font-size: 14px; color: #333; font-weight: 600;">${contrato}</span>
+                                <span style="font-size: 14px; color: #2A323E; font-weight: 600;">${contrato}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-map-marker-alt" style="color: #A78652; font-size: 12px; width: 16px;"></i>
-                                <span style="font-size: 14px; color: #333; font-weight: 600;">${cidade}</span>
+                                <span style="font-size: 14px; color: #2A323E; font-weight: 600;">${cidade}</span>
                             </div>
                         </div>
                         

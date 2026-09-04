@@ -6,7 +6,7 @@
     <title>Painel Administrativo - Império</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    link rel="icon" type="image/png" href="assets/IconeImperio.png">
+    <link rel="icon" type="image/png" href="../assets/IconeImperio.png">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -21,28 +21,46 @@
         }
 
         :root {
-            --primary-gradient: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-            --primary-color: #ff6b35;
-            --primary-dark: #e55a2b;
-            --secondary-color: #ff8c42;
+            /* ===== Paleta da marca — Imperio Recursos Humanos ===== */
+            /* Marinho + dourado, extraidos do logo oficial */
+            --navy:        #2A323E;
+            --navy-dark:   #1C232D;
+            --navy-soft:   #3D4757;
+            --gold:        #A78652;
+            --gold-light:  #D7B071;
+            --gold-dark:   #7A5F37;
+            --cream:       #F5F1EA;
+
+            /* Gradiente principal = as duas cores do logo */
+            --primary-gradient: linear-gradient(135deg, #2A323E 0%, #7A5F37 100%);
+            /* Gradiente de destaque (barras de grafico, linhas de acento) */
+            --accent-gradient:  linear-gradient(135deg, #A78652 0%, #D7B071 100%);
+
+            /* Acao principal: dourado escuro — legivel como texto sobre
+               fundo claro E com texto branco por cima (contraste AA) */
+            --primary-color:   #7A5F37;
+            --primary-dark:    #5F4A2A;
+            --secondary-color: #A78652;
+
+            /* Status semanticos */
             --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #ffa500;
-            --info-color: #ff6b35;
-            --dark-bg: #000000;
-            --sidebar-bg: #1a1a1a;
-            --content-bg: #f5f5f5;
-            --card-bg: #ffffff;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --border-color: #e0e0e0;
-            --accent-orange: #ff6b35;
-            --accent-light-orange: #ff8c42;
+            --danger-color:  #ef4444;
+            --warning-color: #B7791F;
+            --info-color:    #3D4757;
+
+            /* Superficies e texto */
+            --dark-bg:        #151B23;
+            --sidebar-bg:     #1C232D;
+            --content-bg:     #F7F5F1;
+            --card-bg:        #FFFFFF;
+            --text-primary:   #2A323E;
+            --text-secondary: #5C6673;
+            --border-color:   #E4E0D8;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #fafafa;
+            background: var(--content-bg);
             color: var(--text-primary);
             overflow-x: hidden;
         }
@@ -76,7 +94,7 @@
             left: 24px;
             right: 24px;
             height: 3px;
-            background: var(--primary-gradient);
+            background: var(--accent-gradient);
         }
 
         .sidebar-logo {
@@ -95,12 +113,12 @@
         .sidebar-user {
             margin-top: 20px;
             padding: 12px;
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 140, 66, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(167, 134, 82, 0.12) 0%, rgba(167, 134, 82, 0.05) 100%);
             border-radius: 10px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border: 1px solid rgba(255, 107, 53, 0.2);
+            border: 1px solid rgba(167, 134, 82, 0.25);
         }
 
         .user-avatar {
@@ -162,13 +180,13 @@
         }
 
         .nav-item:hover {
-            background: linear-gradient(90deg, rgba(255, 107, 53, 0.1) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(167, 134, 82, 0.14) 0%, transparent 100%);
             color: var(--primary-color);
             border-left-color: var(--primary-color);
         }
 
         .nav-item.active {
-            background: linear-gradient(90deg, rgba(255, 107, 53, 0.15) 0%, rgba(255, 140, 66, 0.05) 100%);
+            background: linear-gradient(90deg, rgba(167, 134, 82, 0.18) 0%, rgba(167, 134, 82, 0.03) 100%);
             color: var(--primary-color);
             border-left-color: var(--primary-color);
             font-weight: 600;
@@ -252,7 +270,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: var(--primary-gradient);
+            background: var(--accent-gradient);
         }
 
         .topbar-title h1 {
@@ -338,7 +356,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: var(--primary-gradient);
+            background: var(--accent-gradient);
         }
 
         .metric-header {
@@ -360,19 +378,19 @@
         }
 
         .metric-icon.purple {
-            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            background: linear-gradient(135deg, #2A323E 0%, #3D4757 100%);
         }
 
         .metric-icon.pink {
-            background: linear-gradient(135deg, #ff8c42 0%, #ffb347 100%);
+            background: linear-gradient(135deg, #8A6D40 0%, #A78652 100%);
         }
 
         .metric-icon.blue {
-            background: linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%);
+            background: linear-gradient(135deg, #3D4757 0%, #5C6673 100%);
         }
 
         .metric-icon.yellow {
-            background: linear-gradient(135deg, #ffb347 0%, #ff6b35 100%);
+            background: linear-gradient(135deg, #7A5F37 0%, #A78652 100%);
         }
 
         .metric-trend {
@@ -461,7 +479,7 @@
 
         .chart-placeholder {
             height: 280px;
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(255, 140, 66, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(167, 134, 82, 0.08) 0%, rgba(42, 50, 62, 0.05) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -490,7 +508,7 @@
 
         .bar {
             width: 100%;
-            background: var(--primary-gradient);
+            background: var(--accent-gradient);
             border-radius: 8px 8px 0 0;
             position: relative;
             animation: growBar 1s ease-out;
@@ -552,7 +570,7 @@
 
         .distribution-fill {
             height: 100%;
-            background: var(--primary-gradient);
+            background: var(--accent-gradient);
             border-radius: 4px;
             transition: width 0.8s ease;
         }
@@ -586,12 +604,12 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 4px 12px rgba(42, 50, 62, 0.28);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 6px 20px rgba(42, 50, 62, 0.38);
         }
 
         .search-box {
@@ -611,7 +629,7 @@
         .search-box input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+            box-shadow: 0 0 0 3px rgba(167, 134, 82, 0.20);
         }
 
         .search-box i {
@@ -684,18 +702,18 @@
         }
 
         .type-badge.remoto {
-            background: #ffe5d9;
-            color: #ff6b35;
+            background: #F5EFE3;
+            color: #7A5F37;
         }
 
         .type-badge.hibrido {
-            background: #fff3e0;
-            color: #ff8c42;
+            background: #E7EAEE;
+            color: #3D4757;
         }
 
         .type-badge.presencial {
-            background: #e0e0e0;
-            color: #1a1a1a;
+            background: #EDE7DC;
+            color: #2A323E;
         }
 
         .action-buttons {
@@ -716,8 +734,8 @@
         }
 
         .btn-edit {
-            background: #ffe5d9;
-            color: #ff6b35;
+            background: #F5EFE3;
+            color: #7A5F37;
         }
 
         .btn-edit:hover {
@@ -842,7 +860,7 @@
         .form-textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+            box-shadow: 0 0 0 3px rgba(167, 134, 82, 0.20);
         }
 
         .form-textarea {

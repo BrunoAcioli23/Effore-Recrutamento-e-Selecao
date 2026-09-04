@@ -6,7 +6,7 @@
     <title>Login de Admin - Império</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    link rel="icon" type="image/png" href="assets/IconeImperio.png">
+    <link rel="icon" type="image/png" href="../assets/IconeImperio.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Firebase SDK -->
@@ -20,7 +20,7 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #fd8625 0%, #000000 100%);
+            background: linear-gradient(135deg, #2A323E 0%, #1C232D 45%, #7A5F37 100%);
             font-family: 'Poppins', sans-serif;
             display: flex;
             align-items: center;
@@ -47,7 +47,7 @@
             position: absolute;
             width: 400px;
             height: 400px;
-            background: rgba(255, 153, 0, 0.05);
+            background: rgba(167, 134, 82, 0.10);
             border-radius: 50%;
             bottom: -150px;
             right: -150px;
@@ -98,7 +98,7 @@
             left: 0;
             right: 0;
             height: 5px;
-            background: linear-gradient(90deg, #fd8625 0%, #000000 100%);
+            background: linear-gradient(90deg, #A78652 0%, #D7B071 100%);
         }
 
         /* Logo */
@@ -122,7 +122,7 @@
         /* Título */
         .login-title {
             text-align: center;
-            color: #2d3748;
+            color: #2A323E;
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 10px;
@@ -131,7 +131,7 @@
 
         .login-subtitle {
             text-align: center;
-            color: #718096;
+            color: #5C6673;
             font-size: 14px;
             margin-bottom: 35px;
             font-weight: 400;
@@ -151,7 +151,7 @@
 
         .input-group label {
             display: block;
-            color: #4a5568;
+            color: #5C6673;
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 8px;
@@ -167,7 +167,7 @@
         .input-icon {
             position: absolute;
             left: 16px;
-            color: #a0aec0;
+            color: #8B94A0;
             font-size: 18px;
             transition: color 0.3s ease;
             pointer-events: none;
@@ -176,39 +176,39 @@
         .login-input {
             width: 100%;
             padding: 14px 16px 14px 48px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #E4E0D8;
             border-radius: 12px;
             font-size: 15px;
             font-family: 'Poppins', sans-serif;
             transition: all 0.3s ease;
-            background: #f7fafc;
-            color: #2d3748;
+            background: #F7F5F1;
+            color: #2A323E;
         }
 
         .login-input:focus {
             outline: none;
-            border-color: #fd8625;
+            border-color: #A78652;
             background: white;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(167, 134, 82, 0.18);
         }
 
         .login-input:focus + .input-icon {
-            color: #fd8625;
+            color: #7A5F37;
         }
 
         .input-group:focus-within label {
-            color: #fd8625;
+            color: #7A5F37;
         }
 
         .login-input::placeholder {
-            color: #cbd5e0;
+            color: #A8AEB8;
         }
 
         /* Botão de Login */
         .login-button {
             margin-top: 10px;
             padding: 16px;
-            background: linear-gradient(135deg, #fd8625 0%, #000000 100%);
+            background: linear-gradient(135deg, #7A5F37 0%, #2A323E 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -217,7 +217,7 @@
             font-family: 'Poppins', sans-serif;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(42, 50, 62, 0.35);
             position: relative;
             overflow: hidden;
         }
@@ -235,7 +235,7 @@
 
         .login-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 6px 20px rgba(42, 50, 62, 0.45);
         }
 
         .login-button:hover::before {
@@ -256,8 +256,8 @@
         .login-error {
             margin-top: 15px;
             padding: 12px 16px;
-            background: #fff5f5;
-            border: 1px solid #feb2b2;
+            background: #FDF2F2;
+            border: 1px solid #E9B8B8;
             border-radius: 10px;
             color: #c53030;
             font-size: 14px;
@@ -283,7 +283,7 @@
         }
 
         .back-link a {
-            color: #fd8625;
+            color: #7A5F37;
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
@@ -294,7 +294,7 @@
         }
 
         .back-link a:hover {
-            color: #000000;
+            color: #2A323E;
             gap: 10px;
         }
 

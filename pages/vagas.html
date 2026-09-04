@@ -6,7 +6,7 @@
     <title>Vagas Abertas - Imperio Recursos Humanos</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
-    link rel="icon" type="image/png" href="assets/IconeImperio.png">
+    <link rel="icon" type="image/png" href="../assets/IconeImperio.png">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -199,10 +199,10 @@
     </main>
 
     <!-- Modal de Detalhes da Vaga -->
-    <div id="modal-detalhes-vaga" class="modal-detalhes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; overflow-y: auto; padding: 20px;">
+    <div id="modal-detalhes-vaga" class="modal-detalhes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28, 35, 45, 0.65); z-index: 9999; overflow-y: auto; padding: 20px;">
         <div class="modal-detalhes-content" style="background: white; max-width: 800px; margin: 40px auto; border-radius: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: slideDown 0.3s ease;">
             <!-- Header do Modal -->
-            <div class="modal-detalhes-header" style="background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; position: relative;">
+            <div class="modal-detalhes-header" style="background: linear-gradient(135deg, #2A323E 0%, #3D4757 100%); color: white; padding: 30px; border-radius: 16px 16px 0 0; position: relative;">
                 <button class="modal-close-btn" onclick="fecharModalDetalhes()" style="position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
                     <i class="fas fa-times"></i>
                 </button>
@@ -213,61 +213,61 @@
             <!-- Corpo do Modal -->
             <div class="modal-detalhes-body" style="padding: 30px;">
                 <!-- Informações Principais -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; padding: 20px; background: #F7F5F1; border-radius: 12px;">
                     <div>
-                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
-                            <i class="fas fa-money-bill-wave" style="color: #ff6b35; margin-right: 5px;"></i> Salário
+                        <div style="font-size: 12px; color: #5C6673; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-money-bill-wave" style="color: #A78652; margin-right: 5px;"></i> Salário
                         </div>
-                        <div id="modal-salario" style="font-size: 18px; color: #ff6b35; font-weight: 700;"></div>
+                        <div id="modal-salario" style="font-size: 18px; color: #7A5F37; font-weight: 700;"></div>
                     </div>
                     <div>
-                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
-                            <i class="fas fa-briefcase" style="color: #ff6b35; margin-right: 5px;"></i> Contrato
+                        <div style="font-size: 12px; color: #5C6673; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-briefcase" style="color: #A78652; margin-right: 5px;"></i> Contrato
                         </div>
-                        <div id="modal-contrato" style="font-size: 18px; color: #333; font-weight: 600;"></div>
+                        <div id="modal-contrato" style="font-size: 18px; color: #2A323E; font-weight: 600;"></div>
                     </div>
                     <div>
-                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
-                            <i class="fas fa-map-marker-alt" style="color: #ff6b35; margin-right: 5px;"></i> Localização
+                        <div style="font-size: 12px; color: #5C6673; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-map-marker-alt" style="color: #A78652; margin-right: 5px;"></i> Localização
                         </div>
-                        <div id="modal-cidade" style="font-size: 18px; color: #333; font-weight: 600;"></div>
+                        <div id="modal-cidade" style="font-size: 18px; color: #2A323E; font-weight: 600;"></div>
                     </div>
                     <div id="modal-horario-container">
-                        <div style="font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
-                            <i class="fas fa-clock" style="color: #ff6b35; margin-right: 5px;"></i> Horário
+                        <div style="font-size: 12px; color: #5C6673; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">
+                            <i class="fas fa-clock" style="color: #A78652; margin-right: 5px;"></i> Horário
                         </div>
-                        <div id="modal-horario" style="font-size: 18px; color: #333; font-weight: 600;"></div>
+                        <div id="modal-horario" style="font-size: 18px; color: #2A323E; font-weight: 600;"></div>
                     </div>
                 </div>
 
                 <!-- Descrição -->
                 <div id="modal-descricao-container" style="margin-bottom: 30px;">
-                    <h3 style="font-size: 20px; color: #1a1a1a; margin: 0 0 15px 0; font-weight: 700; border-bottom: 2px solid #ff6b35; padding-bottom: 10px;">
-                        <i class="fas fa-file-alt" style="color: #ff6b35; margin-right: 8px;"></i> Descrição da Vaga
+                    <h3 style="font-size: 20px; color: #2A323E; margin: 0 0 15px 0; font-weight: 700; border-bottom: 2px solid #A78652; padding-bottom: 10px;">
+                        <i class="fas fa-file-alt" style="color: #A78652; margin-right: 8px;"></i> Descrição da Vaga
                     </h3>
-                    <div id="modal-descricao" style="font-size: 15px; color: #555; line-height: 1.8; white-space: pre-line;"></div>
+                    <div id="modal-descricao" style="font-size: 15px; color: #5C6673; line-height: 1.8; white-space: pre-line;"></div>
                 </div>
 
                 <!-- Benefícios -->
                 <div id="modal-beneficios-container">
-                    <h3 style="font-size: 20px; color: #1a1a1a; margin: 0 0 15px 0; font-weight: 700; border-bottom: 2px solid #ff6b35; padding-bottom: 10px;">
-                        <i class="fas fa-gift" style="color: #ff6b35; margin-right: 8px;"></i> Benefícios
+                    <h3 style="font-size: 20px; color: #2A323E; margin: 0 0 15px 0; font-weight: 700; border-bottom: 2px solid #A78652; padding-bottom: 10px;">
+                        <i class="fas fa-gift" style="color: #A78652; margin-right: 8px;"></i> Benefícios
                     </h3>
                     <div id="modal-beneficios" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
                 </div>
 
                 <!-- Data de Publicação -->
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e5e5; font-size: 14px; color: #999;">
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E4E0D8; font-size: 14px; color: #5C6673;">
                     <i class="fas fa-calendar-alt" style="margin-right: 5px;"></i> Publicada em <span id="modal-data-criacao"></span>
                 </div>
             </div>
 
             <!-- Footer do Modal -->
-            <div class="modal-detalhes-footer" style="padding: 20px 30px; background: #f8f9fa; border-radius: 0 0 16px 16px; display: flex; gap: 12px; justify-content: flex-end;">
-                <button onclick="fecharModalDetalhes()" style="padding: 12px 24px; background: #e5e5e5; color: #666; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <div class="modal-detalhes-footer" style="padding: 20px 30px; background: #F7F5F1; border-radius: 0 0 16px 16px; display: flex; gap: 12px; justify-content: flex-end;">
+                <button onclick="fecharModalDetalhes()" style="padding: 12px 24px; background: #EDE7DC; color: #2A323E; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
                     Fechar
                 </button>
-                <button onclick="scrollToFormulario()" style="padding: 12px 32px; background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);">
+                <button onclick="scrollToFormulario()" style="padding: 12px 32px; background: linear-gradient(135deg, #D7B071 0%, #C29A5E 100%); color: #2A323E; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(167, 134, 82, 0.35);">
                     <i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Candidatar-se Agora
                 </button>
             </div>
@@ -301,11 +301,11 @@
         }
 
         .modal-detalhes::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(42, 50, 62, 0.12);
         }
 
         .modal-detalhes::-webkit-scrollbar-thumb {
-            background: #ff6b35;
+            background: #A78652;
             border-radius: 5px;
         }
 

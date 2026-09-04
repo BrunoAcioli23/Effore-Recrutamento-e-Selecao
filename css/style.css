@@ -6,15 +6,39 @@
 }
 
 :root {
-    /* Paleta de Cores Baseada no Logo */
-    --color-black: #1a1a1a; /* Um preto um pouco mais suave que o #000 */
-    --color-orange: #A78652;  /* O cinza do logo */
-    --color-white: #FFFFFF;
-    --color-bg-light: #f9f9f9; /* Um cinza bem claro para fundos de seção */
+    /* ============================================================
+       PALETA DA MARCA — Imperio Recursos Humanos
+       Cores extraidas diretamente do logo oficial
+       ============================================================ */
 
-    /* Aliases para componentes */
-    --color-primary: #d7b071;
-    --color-primary-dark: #A78652 ;
+    /* Azul-marinho do logo */
+    --color-navy:        #2A323E;  /* Marinho principal */
+    --color-navy-dark:   #1C232D;  /* Marinho profundo (rodape, headers) */
+    --color-navy-soft:   #3D4757;  /* Marinho suave (bordas em fundo escuro) */
+
+    /* Dourado do logo */
+    --color-gold:        #A78652;  /* Dourado oficial */
+    --color-gold-light:  #D7B071;  /* Dourado claro (destaque em fundo escuro) */
+    --color-gold-dark:   #7A5F37;  /* Dourado escuro (texto em fundo claro) */
+
+    /* Bege/creme do fundo do logo */
+    --color-cream:       #F5F1EA;
+    --color-cream-dark:  #EDE7DC;
+
+    /* Neutros */
+    --color-white:       #FFFFFF;
+    --color-text:        #2A323E;  /* Texto principal = marinho */
+    --color-text-muted:  #5C6673;  /* Texto secundario */
+    --color-border:      #E4E0D8;  /* Bordas (bege acinzentado) */
+    --color-bg-light:    #F7F5F1;  /* Fundo de secao (creme sutil) */
+
+    /* ---- Aliases de compatibilidade ----
+       Mantidos para que o CSS existente continue funcionando.
+       --color-orange e legado do tema antigo: hoje aponta para o dourado. */
+    --color-black:        var(--color-navy);
+    --color-orange:       var(--color-gold);
+    --color-primary:      var(--color-gold-light);
+    --color-primary-dark: var(--color-gold);
 
     /* Fontes */
     --font-primary: 'Poppins', sans-serif;
@@ -25,15 +49,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #ffffff;
+  background: var(--color-cream);
 }
 
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background: 
     linear-gradient(to bottom,
-      #ffffff 20%,
-      #A78652 100%
+      var(--color-cream) 20%,
+      var(--color-gold) 100%
     );
 }
 
@@ -57,10 +81,10 @@ body::before {
   height: 100vh;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(45deg, #A78652, #fff, #A78652);
+  background: linear-gradient(45deg, var(--color-gold), var(--color-cream), var(--color-navy));
   background-size: 200% 200%;
   animation: degradeAnimado 10s ease infinite;
-  opacity: 0.05;
+  opacity: 0.06;
 }
 
 .container {
@@ -72,7 +96,7 @@ body::before {
 /* 2. ESTILOS DO CABEÇALHO (HEADER) */
 .header {
     background-color: var(--color-white);
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--color-border);
     padding: 5px 0 0 0;
     position: sticky;
     top: 0;
@@ -116,7 +140,7 @@ body::before {
 
 .nav-link:hover,
 .nav-link.active {
-    color: var(--color-orange); /* Cor de destaque ao passar o mouse */
+    color: var(--color-gold-dark); /* Destaque ao passar o mouse (contraste AA) */
 }
 
 /* 3. BOTÕES (REUTILIZÁVEIS) */
@@ -186,7 +210,7 @@ body::before {
 
 .hero-subtitle {
     font-size: 1.1rem;
-    color: var(--color-orange); /* Cor original do seu CSS */
+    color: var(--color-gold-light); /* Dourado claro sobre o video escuro */
     margin-bottom: 30px;
 }
 
@@ -219,7 +243,7 @@ body::before {
     background-color: var(--color-white);
     padding: 30px;
     border-radius: 8px;
-    border: 1px solid #eee;
+    border: 1px solid var(--color-border);
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -231,7 +255,7 @@ body::before {
 
 .service-icon {
     font-size: 3rem;
-    color: var(--color-orange); /* Ícone no cinza do logo */
+    color: var(--color-gold); /* Dourado do logo */
     margin-bottom: 20px;
 }
 
@@ -275,7 +299,7 @@ body::before {
 }
 
 .footer-social a:hover {
-    color: var(--color-orange);
+    color: var(--color-gold-light);
 }
 
 /* --- NOVAS SEÇÕES ABAIXO --- */
@@ -307,7 +331,7 @@ body::before {
 
 .about-content p {
     font-size: 1.05rem;
-    color: #555;
+    color: var(--color-text-muted);
     margin-bottom: 20px;
 }
 
@@ -337,7 +361,7 @@ body::before {
     align-items: center;
     padding: 25px 30px;
     background-color: var(--color-white);
-    border: 1px solid #eee;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     transition: all 0.3s ease;
 }
@@ -356,7 +380,7 @@ body::before {
 }
 
 .job-location {
-    color: var(--color-orange);
+    color: var(--color-gold-dark);
     font-weight: 500;
 }
 
@@ -381,7 +405,7 @@ body::before {
     background-color: var(--color-bg-light);
     padding: 30px;
     border-radius: 8px;
-    border: 1px solid #eee;
+    border: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -390,7 +414,7 @@ body::before {
 .testimonial-text {
     font-size: 1.1rem;
     font-style: italic;
-    color: #555;
+    color: var(--color-text-muted);
     margin-bottom: 20px;
     position: relative;
     padding-left: 20px;
@@ -410,7 +434,7 @@ body::before {
 
 .author-title {
     font-size: 0.9rem;
-    color: #777;
+    color: var(--color-text-muted);
 }
 
 /* 11. SEÇÃO DE CONTATO */
@@ -426,7 +450,7 @@ body::before {
     background-color: var(--color-white);
     padding: 40px;
     border-radius: 8px;
-    border: 1px solid #eee;
+    border: 1px solid var(--color-border);
 }
 
 .contact-info h3 {
@@ -436,7 +460,7 @@ body::before {
 
 .contact-info p {
     margin-bottom: 20px;
-    color: #555;
+    color: var(--color-text-muted);
 }
 
 .contact-info ul {
@@ -474,7 +498,7 @@ body::before {
 .contact-form textarea {
     width: 100%;
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 5px;
     font-family: var(--font-primary);
 }
@@ -561,7 +585,7 @@ body::before {
 
 .page-subtitle {
     font-size: 1.1rem;
-    color: var(--color-orange);
+    color: var(--color-gold-light);
     margin-top: 10px;
 }
 
@@ -581,7 +605,7 @@ body::before {
     background-color: var(--color-white);
     padding: 30px;
     border-radius: 8px;
-    border: 1px solid #eee;
+    border: 1px solid var(--color-border);
     text-align: center;
 }
 
@@ -653,7 +677,7 @@ body::before {
 
 .cta-text p {
     font-size: 1.1rem;
-    color: #ccc; /* Cinza claro para o texto */
+    color: var(--color-cream-dark); /* Texto claro sobre o marinho */
     margin-bottom: 20px;
 }
 
@@ -663,7 +687,7 @@ body::before {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
-    color: #eee;
+    color: var(--color-cream-dark);
 }
 
 .contact-form-b2b input,
@@ -672,10 +696,10 @@ body::before {
 .empresa-form textarea {
     width: 100%;
     padding: 12px;
-    border: 1px solid #555; /* Borda mais escura */
+    border: 1px solid var(--color-navy-soft); /* Borda sobre o marinho */
     border-radius: 5px;
     font-family: var(--font-primary);
-    background-color: #333; /* Fundo do input */
+    background-color: var(--color-navy-dark); /* Fundo do input */
     color: var(--color-white); /* Texto do input */
 }
 
@@ -770,7 +794,7 @@ body::before {
 .filter-select {
     width: 100%;
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 5px;
     font-family: var(--font-primary);
     font-size: 15px;
@@ -801,7 +825,7 @@ body::before {
 
 .talent-text p {
     font-size: 1.1rem;
-    color: #ccc;
+    color: var(--color-cream-dark);
 }
 
 .talent-form .form-group-inline {
@@ -814,10 +838,10 @@ body::before {
 .talent-form input {
     width: 100%;
     padding: 12px;
-    border: 1px solid #555;
+    border: 1px solid var(--color-navy-soft);
     border-radius: 5px;
     font-family: var(--font-primary);
-    background-color: #333;
+    background-color: var(--color-navy-dark);
     color: var(--color-white);
 }
 
@@ -830,7 +854,7 @@ body::before {
 /* Estilo do Input de Arquivo */
 .talent-form input[type="file"] {
     padding: 10px;
-    border: 1px dashed #777;
+    border: 1px dashed var(--color-navy-soft);
     background-color: transparent;
     cursor: pointer;
 }
@@ -856,7 +880,7 @@ body::before {
 .process .section-subtitle {
     text-align: center;
     font-size: 1.1rem;
-    color: #555;
+    color: var(--color-text-muted);
     max-width: 600px;
     margin: -30px auto 40px auto;
 }
@@ -965,7 +989,7 @@ body::before {
 /* 2. MUDANÇA: O card agora é horizontal (flex-direction: row) */
 .news-card {
     background-color: var(--color-bg-light);
-    border: 1px solid #eee;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     overflow: hidden;
     display: flex;
@@ -1007,7 +1031,7 @@ body::before {
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--color-black);
-    background-color: #eee;
+    background-color: var(--color-border);
     padding: 2px 6px;
     border-radius: 4px;
     white-space: nowrap;
@@ -1018,7 +1042,7 @@ body::before {
 
 .news-date {
     font-size: 0.85rem;
-    color: var(--color-orange);
+    color: var(--color-gold-dark);
     margin-bottom: 0;
 }
 
@@ -1036,7 +1060,7 @@ body::before {
 .loading-news {
     font-size: 1.2rem;
     text-align: center;
-    color: var(--color-orange);
+    color: var(--color-gold-dark);
 }
 
 /* 5. MUDANÇA: Responsividade para o novo layout */

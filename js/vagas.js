@@ -73,7 +73,7 @@ class VagasDisplay {
 
         if (this.vagasFiltradas.length === 0) {
             jobList.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #666;">
+                <div style="text-align: center; padding: 40px; color: #5C6673;">
                     <p><strong>Nenhuma vaga disponível no momento.</strong></p>
                     <p style="margin-top: 15px;">Mas não se preocupe! Novas oportunidades surgem frequentemente.</p>
                     <p style="margin-top: 10px;">📋 Cadastre-se em nosso <strong>Banco de Talentos</strong> abaixo e seja o primeiro a saber quando uma vaga perfeita para você aparecer!</p>
@@ -104,41 +104,41 @@ class VagasDisplay {
             let beneficiosHTML = '';
             if (vaga.beneficios && vaga.beneficios.length > 0) {
                 const beneficiosLista = vaga.beneficios.map(b => 
-                    `<span style="display: inline-block; background: #fff4e6; color: #A78652; padding: 5px 12px; border-radius: 15px; font-size: 11px; margin-right: 6px; margin-bottom: 6px; font-weight: 500;">${b}</span>`
+                    `<span style="display: inline-block; background: #F5EFE3; color: #7A5F37; padding: 5px 12px; border-radius: 15px; font-size: 11px; margin-right: 6px; margin-bottom: 6px; font-weight: 500;">${b}</span>`
                 ).join('');
                 beneficiosHTML = `<div style="margin-top: 12px;">
-                    <div style="font-size: 12px; color: #999; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Benefícios</div>
+                    <div style="font-size: 12px; color: #5C6673; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Benefícios</div>
                     <div style="display: flex; flex-wrap: wrap;">${beneficiosLista}</div>
                 </div>`;
             }
             
             return `
-                <div class="job-card" data-contrato="${vaga.contrato.toLowerCase()}" style="display: flex; align-items: stretch; gap: 20px; padding: 24px; border: 1px solid #e5e5e5; border-radius: 12px; background: white; transition: all 0.3s ease;">
+                <div class="job-card" data-contrato="${vaga.contrato.toLowerCase()}" style="display: flex; align-items: stretch; gap: 20px; padding: 24px; border: 1px solid #E4E0D8; border-radius: 12px; background: white; transition: all 0.3s ease;">
                     <div class="job-info" style="flex: 1;">
-                        <h3 class="job-title" style="margin: 0 0 16px 0; font-size: 22px; color: #1a1a1a; font-weight: 700; line-height: 1.3;">${tituloCompleto}</h3>
+                        <h3 class="job-title" style="margin: 0 0 16px 0; font-size: 22px; color: #2A323E; font-weight: 700; line-height: 1.3;">${tituloCompleto}</h3>
                         
                         <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-bottom: 4px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-money-bill-wave" style="color: #A78652; font-size: 14px; width: 20px;"></i>
                                 <div>
-                                    <div style="font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Salário</div>
-                                    <div style="font-size: 15px; color: #A78652; font-weight: 700;">${salario}</div>
+                                    <div style="font-size: 11px; color: #5C6673; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Salário</div>
+                                    <div style="font-size: 15px; color: #7A5F37; font-weight: 700;">${salario}</div>
                                 </div>
                             </div>
                             
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-briefcase" style="color: #A78652; font-size: 14px; width: 20px;"></i>
                                 <div>
-                                    <div style="font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Contrato</div>
-                                    <div style="font-size: 15px; color: #333; font-weight: 600;">${contrato}</div>
+                                    <div style="font-size: 11px; color: #5C6673; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Contrato</div>
+                                    <div style="font-size: 15px; color: #2A323E; font-weight: 600;">${contrato}</div>
                                 </div>
                             </div>
                             
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-map-marker-alt" style="color: #A78652; font-size: 14px; width: 20px;"></i>
                                 <div>
-                                    <div style="font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Localização</div>
-                                    <div style="font-size: 15px; color: #333; font-weight: 600;">${cidade}</div>
+                                    <div style="font-size: 11px; color: #5C6673; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Localização</div>
+                                    <div style="font-size: 15px; color: #2A323E; font-weight: 600;">${cidade}</div>
                                 </div>
                             </div>
                         </div>
@@ -268,7 +268,7 @@ function abrirModalDetalhes(vagaId) {
     if (vaga.beneficios && vaga.beneficios.length > 0) {
         beneficiosContainer.style.display = 'block';
         beneficiosDiv.innerHTML = vaga.beneficios.map(b => 
-            `<span style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #fff4e6 0%, #ffe8d1 100%); color: #A78652; padding: 10px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; border: 2px solid #a7865223;">
+            `<span style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #F5EFE3 0%, #EDE2CC 100%); color: #7A5F37; padding: 10px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; border: 2px solid #A7865240;">
                 <i class="fas fa-check-circle" style="margin-right: 8px;"></i> ${b}
             </span>`
         ).join('');
