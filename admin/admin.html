@@ -692,6 +692,11 @@
             color: #dc2626;
         }
 
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .type-badge {
             display: inline-block;
             padding: 4px 10px;
@@ -740,6 +745,16 @@
 
         .btn-edit:hover {
             background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-toggle {
+            background: #E7EAEE;
+            color: var(--navy-soft);
+        }
+
+        .btn-toggle:hover {
+            background: var(--navy-soft);
             color: white;
         }
 
@@ -1125,9 +1140,6 @@
                     <div class="metric-icon purple">
                         <i class="fas fa-briefcase"></i>
                     </div>
-                    <div class="metric-trend up">
-                        <i class="fas fa-arrow-up"></i> 12%
-                    </div>
                 </div>
                 <div class="metric-value" id="total-vagas">0</div>
                 <div class="metric-label">Total de Vagas</div>
@@ -1138,25 +1150,19 @@
                     <div class="metric-icon pink">
                         <i class="fas fa-check-circle"></i>
                     </div>
-                    <div class="metric-trend up">
-                        <i class="fas fa-arrow-up"></i> 8%
-                    </div>
                 </div>
                 <div class="metric-value" id="vagas-ativas">0</div>
-                <div class="metric-label">Vagas Ativas</div>
+                <div class="metric-label">Publicadas no Site</div>
             </div>
 
             <div class="metric-card">
                 <div class="metric-header">
                     <div class="metric-icon blue">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <div class="metric-trend up">
-                        <i class="fas fa-arrow-up"></i> 15%
+                        <i class="fas fa-file-contract"></i>
                     </div>
                 </div>
-                <div class="metric-value" id="vagas-remotas">0</div>
-                <div class="metric-label">Vagas Remotas</div>
+                <div class="metric-value" id="vagas-clt">0</div>
+                <div class="metric-label">Vagas CLT</div>
             </div>
 
             <div class="metric-card">
@@ -1164,9 +1170,7 @@
                     <div class="metric-icon yellow">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <div class="metric-trend up">
-                        <i class="fas fa-arrow-up"></i> 5%
-                    </div>
+                    <div class="metric-trend" id="trend-este-mes"></div>
                 </div>
                 <div class="metric-value" id="vagas-este-mes">0</div>
                 <div class="metric-label">Criadas Este Mês</div>
@@ -1179,9 +1183,9 @@
                 <div class="chart-header">
                     <h3 class="chart-title">📊 Produtividade - Vagas por Período</h3>
                     <div class="chart-filters">
-                        <button class="filter-btn active">7 Dias</button>
-                        <button class="filter-btn">30 Dias</button>
-                        <button class="filter-btn">3 Meses</button>
+                        <button class="filter-btn active" data-dias="7">7 Dias</button>
+                        <button class="filter-btn" data-dias="30">30 Dias</button>
+                        <button class="filter-btn" data-dias="90">3 Meses</button>
                     </div>
                 </div>
                 <div class="chart-placeholder">
@@ -1193,9 +1197,9 @@
 
             <div class="chart-card">
                 <div class="chart-header">
-                    <h3 class="chart-title">📍 Distribuição por Localização</h3>
+                    <h3 class="chart-title">📄 Distribuição por Tipo de Contrato</h3>
                 </div>
-                <div class="distribution-list" id="distribuicao-localizacao">
+                <div class="distribution-list" id="distribuicao-contrato">
                     <!-- Será preenchido dinamicamente -->
                 </div>
             </div>
@@ -1323,7 +1327,6 @@
                         <textarea class="form-textarea" id="vaga-descricao" placeholder="Descreva os requisitos, responsabilidades e outros detalhes da vaga..."></textarea>
                     </div>
                     <input type="hidden" id="vaga-id">
-                    <input type="hidden" id="vaga-ativa" value="true">
                 </form>
             </div>
             <div class="modal-footer">
@@ -1369,37 +1372,8 @@
             });
         });
 
-        // Modal
-        const modal = document.getElementById('modal-vaga');
-        const btnNova = document.getElementById('btn-nova-vaga');
-        const btnCancelar = document.getElementById('btn-cancelar');
-        const btnClose = document.querySelector('.btn-close');
-
-        btnNova.addEventListener('click', () => {
-            document.getElementById('modal-titulo').textContent = 'Nova Vaga';
-            document.getElementById('form-vaga').reset();
-            document.getElementById('vaga-id').value = '';
-            // Limpar todos os checkboxes de benefícios
-            document.querySelectorAll('.benefit-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            modal.classList.add('show');
-        });
-
-        // Botão cancelar apenas limpa o formulário, não fecha o modal
-        btnCancelar.addEventListener('click', () => {
-            if (confirm('Deseja realmente cancelar? Os dados preenchidos serão perdidos.')) {
-                modal.classList.remove('show');
-            }
-        });
-
-        // Apenas o X fecha o modal
-        btnClose.addEventListener('click', () => {
-            modal.classList.remove('show');
-        });
-
-        // Remover o evento de clicar fora do modal
-        // (comentado para não fechar ao clicar no backdrop)
+        // O modal (abrir, fechar, limpar) e controlado pelo VagasManager em
+        // admin-vagas.js, que e quem sabe se ha uma vaga em edicao.
     </script>
 </body>
 </html>

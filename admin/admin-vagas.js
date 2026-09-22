@@ -4,15 +4,16 @@ class VagasManager {
     constructor() {
         this.vagas = [];
         this.vagaEditandoId = null;
+        this.termoBusca = '';
+        this.periodoDias = 7;
         this.vagasCollection = db.collection('vagas');
         this.inicializar();
     }
 
     async inicializar() {
         this.configurarEventos();
-        await this.carregarVagas();
-        
-        // Listener em tempo real para mudanças no Firestore
+
+        // Listener em tempo real para mudanças no Firestore (tambem faz a carga inicial)
         this.vagasCollection.onSnapshot((snapshot) => {
             this.vagas = [];
             snapshot.forEach((doc) => {
@@ -41,6 +42,21 @@ class VagasManager {
             this.salvarVaga();
         });
 
+        // Abertura e fechamento do modal
+        document.getElementById('btn-nova-vaga').addEventListener('click', () => {
+            this.abrirModalNova();
+        });
+
+        document.getElementById('btn-cancelar').addEventListener('click', () => {
+            if (confirm('Deseja realmente cancelar? Os dados preenchidos serão perdidos.')) {
+                this.fecharModal();
+            }
+        });
+
+        document.querySelector('.btn-close').addEventListener('click', () => {
+            this.fecharModal();
+        });
+
         // Prevenir submit do form
         document.getElementById('form-vaga').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -51,29 +67,16 @@ class VagasManager {
         searchInput.addEventListener('input', (e) => {
             this.filtrarVagas(e.target.value);
         });
-    }
 
-    async carregarVagas() {
-        try {
-            const snapshot = await this.vagasCollection.get();
-            this.vagas = [];
-            snapshot.forEach((doc) => {
-                this.vagas.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
+        // Filtros de período do gráfico
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                this.periodoDias = Number(e.currentTarget.dataset.dias) || 7;
+                this.renderizarGrafico();
             });
-            // Ordenar no client-side
-            this.vagas.sort((a, b) => {
-                if (a.criadoEm && b.criadoEm) {
-                    return b.criadoEm.toDate() - a.criadoEm.toDate();
-                }
-                return 0;
-            });
-            this.renderizarTudo();
-        } catch (error) {
-            console.error('Erro ao carregar vagas:', error);
-        }
+        });
     }
 
     async salvarNoFirestore(vaga, isUpdate = false) {
@@ -111,6 +114,22 @@ class VagasManager {
         }
     }
 
+    async alternarStatus(id, ativa) {
+        try {
+            await this.vagasCollection.doc(id).update({
+                ativa: ativa,
+                atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            this.mostrarNotificacao(
+                ativa ? 'Vaga publicada no site!' : 'Vaga despublicada e removida do site.',
+                'success'
+            );
+        } catch (error) {
+            console.error('Erro ao alterar status da vaga:', error);
+            this.mostrarNotificacao('Erro ao alterar status: ' + error.message, 'error');
+        }
+    }
+
     renderizarTudo() {
         this.atualizarMetricas();
         this.renderizarGrafico();
@@ -123,13 +142,13 @@ class VagasManager {
         const totalVagas = this.vagas.length;
         document.getElementById('total-vagas').textContent = totalVagas;
 
-        // Vagas ativas
-        const vagasAtivas = this.vagas.filter(v => v.ativa !== false).length;
+        // Vagas publicadas (mesmo critério do site público)
+        const vagasAtivas = this.vagas.filter(v => this.estaPublicada(v)).length;
         document.getElementById('vagas-ativas').textContent = vagasAtivas;
 
         // Vagas CLT
         const vagasCLT = this.vagas.filter(v => v.contrato === 'clt').length;
-        document.getElementById('vagas-remotas').textContent = vagasCLT;
+        document.getElementById('vagas-clt').textContent = vagasCLT;
 
         // Vagas criadas este mês
         const dataAtual = new Date();
@@ -143,44 +162,116 @@ class VagasManager {
         }).length;
         document.getElementById('vagas-este-mes').textContent = vagasEsteMes;
 
+        // Variação real contra o mês anterior
+        const mesAnterior = new Date(anoAtual, mesAtual - 1, 1);
+        const vagasMesAnterior = this.vagas.filter(v => {
+            if (!v.criadoEm) return false;
+            const dataCriacao = v.criadoEm.toDate();
+            return dataCriacao.getMonth() === mesAnterior.getMonth() &&
+                   dataCriacao.getFullYear() === mesAnterior.getFullYear();
+        }).length;
+        this.renderizarTrend(vagasEsteMes, vagasMesAnterior);
+
         // Atualizar badge no menu
         document.getElementById('vagas-count').textContent = totalVagas;
     }
 
-    renderizarGrafico() {
-        const chartContainer = document.getElementById('vagas-periodo-chart');
-        
-        // Últimos 7 dias
-        const hoje = new Date();
-        const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-        const dados = [];
+    badgeStatus(vaga) {
+        if (vaga.ativa === true) {
+            return '<span class="status-badge active">Publicada</span>';
+        }
+        if (vaga.ativa === false) {
+            return '<span class="status-badge inactive">Despublicada</span>';
+        }
+        // Campo ausente: o site publico ja nao mostra esta vaga
+        return '<span class="status-badge pending" title="Sem o campo ativa; o site público não exibe esta vaga">Não publicada</span>';
+    }
 
-        for (let i = 6; i >= 0; i--) {
-            const data = new Date(hoje);
-            data.setDate(data.getDate() - i);
-            const dia = diasSemana[data.getDay()];
-            
-            const vagasNoDia = this.vagas.filter(v => {
-                if (!v.criadoEm) return false;
-                const dataCriacao = v.criadoEm.toDate();
-                return dataCriacao.toDateString() === data.toDateString();
-            }).length;
+    renderizarTrend(atual, anterior) {
+        const el = document.getElementById('trend-este-mes');
+        if (!el) return;
 
-            dados.push({ dia, count: vagasNoDia });
+        // Sem base de comparação, não há variação honesta a mostrar
+        if (anterior === 0) {
+            el.className = 'metric-trend';
+            el.innerHTML = '';
+            el.title = '';
+            return;
         }
 
+        const variacao = Math.round(((atual - anterior) / anterior) * 100);
+        const subiu = variacao >= 0;
+        el.className = 'metric-trend ' + (subiu ? 'up' : 'down');
+        el.innerHTML = `<i class="fas fa-arrow-${subiu ? 'up' : 'down'}"></i> ${Math.abs(variacao)}%`;
+        el.title = `${atual} este mês vs ${anterior} no mês anterior`;
+    }
+
+    renderizarGrafico() {
+        const chartContainer = document.getElementById('vagas-periodo-chart');
+        const dados = this.dadosDoPeriodo(this.periodoDias);
         const maxValue = Math.max(...dados.map(d => d.count), 1);
 
         chartContainer.innerHTML = dados.map(d => {
             const altura = (d.count / maxValue) * 100;
             return `
-                <div class="bar-item">
+                <div class="bar-item" title="${d.count} vaga(s) em ${d.dia}">
                     <div class="bar-value">${d.count}</div>
                     <div class="bar" style="height: ${altura}%"></div>
                     <div class="bar-label">${d.dia}</div>
                 </div>
             `;
         }).join('');
+    }
+
+    // Agrupa as vagas do período: por dia em 7 dias, por semana em 30, por mês em 90
+    dadosDoPeriodo(dias) {
+        const criadas = this.vagas
+            .filter(v => v.criadoEm)
+            .map(v => v.criadoEm.toDate());
+
+        const contarEntre = (inicio, fim) =>
+            criadas.filter(d => d >= inicio && d < fim).length;
+
+        const inicioDoDia = (data) => {
+            const d = new Date(data);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        };
+
+        const hoje = new Date();
+        const dados = [];
+
+        if (dias <= 7) {
+            const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            for (let i = dias - 1; i >= 0; i--) {
+                const data = new Date(hoje);
+                data.setDate(data.getDate() - i);
+                const inicio = inicioDoDia(data);
+                const fim = new Date(inicio);
+                fim.setDate(fim.getDate() + 1);
+                dados.push({ dia: diasSemana[inicio.getDay()], count: contarEntre(inicio, fim) });
+            }
+        } else if (dias <= 30) {
+            const tamanhoBucket = 5;
+            const buckets = Math.ceil(dias / tamanhoBucket);
+            for (let i = buckets - 1; i >= 0; i--) {
+                const fim = inicioDoDia(hoje);
+                fim.setDate(fim.getDate() - (i * tamanhoBucket) + 1);
+                const inicio = new Date(fim);
+                inicio.setDate(inicio.getDate() - tamanhoBucket);
+                const rotulo = `${String(inicio.getDate()).padStart(2, '0')}/${String(inicio.getMonth() + 1).padStart(2, '0')}`;
+                dados.push({ dia: rotulo, count: contarEntre(inicio, fim) });
+            }
+        } else {
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            for (let i = 2; i >= 0; i--) {
+                const inicio = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+                const fim = new Date(hoje.getFullYear(), hoje.getMonth() - i + 1, 1);
+                dados.push({ dia: meses[inicio.getMonth()], count: contarEntre(inicio, fim) });
+            }
+        }
+
+        return dados;
     }
 
     renderizarDistribuicao() {
@@ -200,7 +291,7 @@ class VagasManager {
         });
 
         const total = this.vagas.length || 1;
-        const container = document.getElementById('distribuicao-localizacao');
+        const container = document.getElementById('distribuicao-contrato');
         
         // Escala sequencial do dourado da marca (do bronze ao dourado claro)
         const cores = {
@@ -227,12 +318,22 @@ class VagasManager {
         }).join('');
     }
 
-    renderizarTabela(vagasFiltradas = null) {
-        const vagas = vagasFiltradas || this.vagas;
+    renderizarTabela() {
+        const vagas = this.vagasVisiveis();
         const container = document.getElementById('vagas-table-container');
-        
+
         if (vagas.length === 0) {
-            container.innerHTML = `
+            container.innerHTML = this.termoBusca
+                ? `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="empty-title">Nenhum resultado para "${this.escapar(this.termoBusca)}"</h3>
+                    <p class="empty-text">Tente outro termo ou limpe a busca</p>
+                </div>
+            `
+                : `
                 <div class="empty-state">
                     <div class="empty-icon">
                         <i class="fas fa-briefcase"></i>
@@ -264,18 +365,21 @@ class VagasManager {
                 <tbody>
                     ${vagas.map(vaga => `
                         <tr>
-                            <td><strong>${vaga.titulo}</strong></td>
-                            <td>${vaga.cidade || vaga.localizacao || 'N/A'}</td>
-                            <td>${vaga.salario || 'A combinar'}</td>
-                            <td>${this.formatarContrato(vaga.contrato)}</td>
-                            <td><span class="status-badge ${vaga.ativa !== false ? 'active' : 'inactive'}">${vaga.ativa !== false ? 'Ativa' : 'Inativa'}</span></td>
+                            <td><strong>${this.escapar(vaga.titulo)}</strong></td>
+                            <td>${this.escapar(vaga.cidade || vaga.localizacao || 'N/A')}</td>
+                            <td>${this.escapar(vaga.salario || 'A combinar')}</td>
+                            <td>${this.escapar(this.formatarContrato(vaga.contrato))}</td>
+                            <td>${this.badgeStatus(vaga)}</td>
                             <td>${this.formatarData(vaga.criadoEm)}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn-action btn-edit" data-id="${vaga.id}" title="Editar">
+                                    <button class="btn-action btn-toggle" data-id="${vaga.id}" data-ativa="${this.estaPublicada(vaga)}" title="${this.estaPublicada(vaga) ? 'Despublicar vaga' : 'Publicar vaga no site'}" aria-label="${this.estaPublicada(vaga) ? 'Despublicar vaga' : 'Publicar vaga no site'}">
+                                        <i class="fas fa-${this.estaPublicada(vaga) ? 'eye-slash' : 'eye'}"></i>
+                                    </button>
+                                    <button class="btn-action btn-edit" data-id="${vaga.id}" title="Editar" aria-label="Editar vaga">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-action btn-delete" data-id="${vaga.id}" title="Excluir">
+                                    <button class="btn-action btn-delete" data-id="${vaga.id}" title="Excluir" aria-label="Excluir vaga">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -300,24 +404,53 @@ class VagasManager {
                 this.excluirVaga(id);
             });
         });
+
+        container.querySelectorAll('.btn-toggle').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                const estaAtiva = e.currentTarget.getAttribute('data-ativa') === 'true';
+                this.alternarStatus(id, !estaAtiva);
+            });
+        });
     }
 
     filtrarVagas(termo) {
-        if (!termo.trim()) {
-            this.renderizarTabela();
-            return;
-        }
+        this.termoBusca = termo.trim();
+        this.renderizarTabela();
+    }
 
-        const termoLower = termo.toLowerCase();
-        const vagasFiltradas = this.vagas.filter(vaga => 
-            vaga.titulo.toLowerCase().includes(termoLower) ||
-            (vaga.cidade && vaga.cidade.toLowerCase().includes(termoLower)) ||
-            (vaga.localizacao && vaga.localizacao.toLowerCase().includes(termoLower)) ||
-            (vaga.salario && vaga.salario.toLowerCase().includes(termoLower)) ||
-            vaga.contrato.toLowerCase().includes(termoLower)
+    vagasVisiveis() {
+        if (!this.termoBusca) return this.vagas;
+
+        const termoLower = this.termoBusca.toLowerCase();
+        const contem = (valor) =>
+            typeof valor === 'string' && valor.toLowerCase().includes(termoLower);
+
+        return this.vagas.filter(vaga =>
+            contem(vaga.titulo) ||
+            contem(vaga.empresa) ||
+            contem(vaga.cidade) ||
+            contem(vaga.localizacao) ||
+            contem(vaga.salario) ||
+            contem(vaga.contrato) ||
+            contem(this.formatarContrato(vaga.contrato))
         );
+    }
 
-        this.renderizarTabela(vagasFiltradas);
+    // Espelha a consulta do site publico: where('ativa', '==', true).
+    // Documento sem o campo nao esta publicado, logo nao pode aparecer como "Ativa".
+    estaPublicada(vaga) {
+        return vaga.ativa === true;
+    }
+
+    escapar(valor) {
+        if (valor === null || valor === undefined) return '';
+        return String(valor)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     formatarContrato(contrato) {
@@ -407,10 +540,26 @@ class VagasManager {
         }
     }
 
+    abrirModalNova() {
+        this.vagaEditandoId = null;
+        document.getElementById('modal-titulo').textContent = 'Nova Vaga';
+        this.limparFormulario();
+        document.getElementById('modal-vaga').classList.add('show');
+    }
+
+    limparFormulario() {
+        document.getElementById('form-vaga').reset();
+        document.getElementById('vaga-id').value = '';
+        document.querySelectorAll('.benefit-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }
+
     editarVaga(id) {
         const vaga = this.vagas.find(v => v.id === id);
         if (vaga) {
             document.getElementById('modal-titulo').textContent = 'Editar Vaga';
+            this.limparFormulario();
             document.getElementById('vaga-id').value = vaga.id;
             document.getElementById('vaga-titulo').value = vaga.titulo;
             document.getElementById('vaga-empresa').value = vaga.empresa || '';
@@ -419,12 +568,7 @@ class VagasManager {
             document.getElementById('vaga-contrato').value = vaga.contrato;
             document.getElementById('vaga-horario').value = vaga.horario || '';
             document.getElementById('vaga-descricao').value = vaga.descricao || '';
-            
-            // Limpar benefícios
-            document.querySelectorAll('.benefit-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            
+
             // Marcar benefícios salvos
             if (vaga.beneficios && Array.isArray(vaga.beneficios)) {
                 vaga.beneficios.forEach(beneficio => {
@@ -458,7 +602,7 @@ class VagasManager {
 
     fecharModal() {
         document.getElementById('modal-vaga').classList.remove('show');
-        document.getElementById('form-vaga').reset();
+        this.limparFormulario();
         this.vagaEditandoId = null;
     }
 
