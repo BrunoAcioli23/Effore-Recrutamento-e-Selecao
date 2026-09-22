@@ -125,7 +125,7 @@ class HomeVagasDisplay {
                         
                         ${beneficiosHTML}
                     </div>
-                    <a href="#s" class="btn btn-outline" onclick="event.preventDefault(); abrirModalDetalhes('${vaga.id}');">Ver Detalhes</a>
+                    <a href="vagas.html#vagas-abertas" class="btn btn-outline">Ver Detalhes</a>
                 </div>
             `;
         }).join('');
