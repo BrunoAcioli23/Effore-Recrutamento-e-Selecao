@@ -179,6 +179,29 @@ class VagasManager {
 
     // ===================== SALÁRIO =====================
 
+    // Os valores foram digitados a mão e misturam convenções: além do padrão
+    // brasileiro "3.647,60", o banco tem "2,500" (vírgula como milhar),
+    // "4,000,00" e "2.198.00". A regra que cobre todos: olhar quantos dígitos
+    // sobram depois do ÚLTIMO separador — 1 ou 2 significam decimal, 3 significam
+    // separador de milhar.
+    static numeroSolto(bruto) {
+        if (!/[.,]/.test(bruto)) {
+            const simples = Number(bruto);
+            return Number.isFinite(simples) ? simples : null;
+        }
+
+        const ultimo = Math.max(bruto.lastIndexOf('.'), bruto.lastIndexOf(','));
+        const decimais = bruto.length - ultimo - 1;
+        const semSeparadores = (t) => t.replace(/[.,]/g, '');
+
+        const normalizado = (decimais === 1 || decimais === 2)
+            ? semSeparadores(bruto.slice(0, ultimo)) + '.' + bruto.slice(ultimo + 1)
+            : semSeparadores(bruto);
+
+        const n = Number(normalizado);
+        return Number.isFinite(n) ? n : null;
+    }
+
     // O campo salário é texto livre ("R$ 3.000,00 - R$ 4.500,00", "5 mil",
     // "A combinar"). Extrai os valores que der; devolve null quando não há número.
     static parseSalario(texto) {
@@ -189,21 +212,13 @@ class VagasManager {
         let m;
 
         while ((m = re.exec(texto)) !== null) {
-            let bruto = m[1];
-            if (bruto.includes(',')) {
-                // "5.000,00" -> "5000.00"
-                bruto = bruto.replace(/\./g, '').replace(',', '.');
-            } else {
-                // "5.000" -> "5000" (ponto como separador de milhar)
-                bruto = bruto.replace(/\.(?=\d{3}\b)/g, '');
-            }
+            const n = VagasManager.numeroSolto(m[1]);
+            if (n === null) continue;
 
-            let n = Number(bruto);
-            if (!Number.isFinite(n)) continue;
-            if (m[2]) n *= 1000;
-            // Descarta ruído do tipo "40h", "12x36", "13o salário"
-            if (n < 100) continue;
-            valores.push(n);
+            const valor = m[2] ? n * 1000 : n;
+            // Descarta ruído do tipo "40h", "12x36", "00000", "13o salário"
+            if (valor < 100) continue;
+            valores.push(valor);
         }
 
         if (!valores.length) return null;
