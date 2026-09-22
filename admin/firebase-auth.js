@@ -1,5 +1,28 @@
 // Sistema de Autenticação com Firebase
 
+// O mesmo formato usado no painel ao criar o acesso ("Maria Silva" -> "maria.silva")
+function gerarUsuario(nome) {
+    return String(nome || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '.')
+        .replace(/^\.+|\.+$/g, '');
+}
+
+// O Firebase Auth so entende e-mail. Quem digita um nome de usuario tem o
+// e-mail resolvido em /logins antes do login — por isso essa colecao permite
+// 'get' sem autenticacao (mas nao 'list', para nao dar para varrer os e-mails).
+async function resolverEmail(entrada) {
+    if (entrada.includes('@')) return entrada;
+
+    const usuario = gerarUsuario(entrada);
+    if (!usuario) return null;
+
+    const doc = await db.collection('logins').doc(usuario).get();
+    return doc.exists ? doc.data().email : null;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('admin-login-form');
     const emailInput = document.getElementById('login-email');
@@ -19,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = emailInput.value.trim();
+            const identificador = emailInput.value.trim();
             const password = passwordInput.value;
 
             // Limpar mensagem de erro
@@ -37,6 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
+                const email = await resolverEmail(identificador);
+
+                if (!email) {
+                    throw { code: 'auth/user-not-found' };
+                }
+
                 // Fazer login com Firebase Authentication
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 
@@ -53,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 switch (error.code) {
                     case 'auth/invalid-email':
-                        mensagemErro = 'Email inválido.';
+                        mensagemErro = 'Usuário ou e-mail inválido.';
                         break;
                     case 'auth/user-disabled':
                         mensagemErro = 'Usuário desabilitado.';
@@ -65,7 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         mensagemErro = 'Senha incorreta.';
                         break;
                     case 'auth/invalid-credential':
-                        mensagemErro = 'Email ou senha incorretos.';
+                        mensagemErro = 'Usuário ou senha incorretos.';
+                        break;
+                    case 'permission-denied':
+                        mensagemErro = 'Não foi possível verificar o usuário. Tente entrar com o e-mail.';
                         break;
                     case 'auth/too-many-requests':
                         mensagemErro = 'Muitas tentativas. Tente novamente mais tarde.';

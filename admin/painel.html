@@ -1508,8 +1508,63 @@
             color: var(--text-secondary);
         }
 
-        .nav-item.oculto {
+        .nav-item.oculto,
+        .nav-section.oculto {
             display: none;
+        }
+
+        .telas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 18px;
+            margin: 6px 0 16px;
+        }
+
+        .telas-secao-titulo {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .usuario-bloco {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .usuario-bloco:last-child {
+            border-bottom: none;
+        }
+
+        .usuario-bloco .usuario-item {
+            border-bottom: none;
+        }
+
+        .usuario-telas {
+            display: block;
+            margin-top: 2px;
+            font-size: 12px;
+            color: var(--gold-dark);
+        }
+
+        .usuario-info code {
+            background: var(--content-bg);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .usuario-editor {
+            padding: 4px 0 18px 54px;
+        }
+
+        .campo-ajuda {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
         .nav-badge.em-breve {
@@ -1784,6 +1839,11 @@
                             <input type="text" class="form-input" id="usuario-nome" placeholder="Ex: Maria Silva" required>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" for="usuario-login">Usuário (para entrar)</label>
+                            <input type="text" class="form-input" id="usuario-login" placeholder="maria.silva" autocomplete="off">
+                            <span class="campo-ajuda">Deixe vazio para gerar a partir do nome</span>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label" for="usuario-email">E-mail</label>
                             <input type="email" class="form-input" id="usuario-email" placeholder="maria@imperiorh.com.br" required>
                         </div>
@@ -1791,11 +1851,15 @@
                             <label class="form-label" for="usuario-senha">Senha provisória</label>
                             <input type="text" class="form-input" id="usuario-senha" placeholder="mínimo 6 caracteres" minlength="6" required autocomplete="off">
                         </div>
-                        <button type="submit" class="btn-primary" id="btn-criar-usuario">
-                            <i class="fas fa-user-plus"></i>
-                            Criar acesso
-                        </button>
                     </div>
+
+                    <label class="form-label" style="margin-top: 22px; display: block;">Telas que esta pessoa pode ver</label>
+                    <div id="telas-novo-usuario"></div>
+
+                    <button type="submit" class="btn-primary" id="btn-criar-usuario">
+                        <i class="fas fa-user-plus"></i>
+                        Criar acesso
+                    </button>
                 </form>
             </div>
 

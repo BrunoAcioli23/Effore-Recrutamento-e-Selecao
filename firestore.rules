@@ -2,48 +2,73 @@ rules_version = '2';
 
 // Regras de acesso ao Firestore.
 //
-// O painel esconde a aba de Usuarios de quem nao e o dono, mas isso e apenas
-// conveniencia visual: qualquer pessoa consegue burlar o que roda no navegador.
-// A autorizacao de verdade e aqui.
+// O painel esconde do menu as telas que a pessoa nao pode ver, mas isso e
+// apenas conveniencia visual: qualquer um consegue burlar o que roda no
+// navegador. A autorizacao de verdade e aqui.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // O dono e o unico que pode criar e remover outros administradores.
+    // O dono e o unico que cria e remove acessos, e enxerga todas as telas.
     // Trocar de dono = trocar este e-mail e publicar as regras de novo.
     function ehDono() {
       return request.auth != null
           && request.auth.token.email.lower() == 'brunoeffore@outlook.com';
     }
 
+    function docAdmin() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
     // Administrador = tem um documento em /admins com o proprio uid.
-    // O dono entra junto para que o sistema funcione mesmo com a colecao vazia
-    // (sem isso, ninguem conseguiria cadastrar o primeiro admin).
+    // O dono entra junto para que o sistema funcione com a colecao vazia
+    // (sem isso, ninguem conseguiria cadastrar o primeiro acesso).
     function ehAdmin() {
       return ehDono()
           || (request.auth != null
               && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
     }
 
+    // Uma tela so esta liberada se estiver na lista de permissoes do admin.
+    // O 'get' com valor padrao evita erro em documentos antigos, sem o campo.
+    function podeVer(tela) {
+      return ehDono()
+          || (request.auth != null
+              && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+              && docAdmin().data.get('permissoes', []).hasAny([tela]));
+    }
+
     // ---------------------------------------------------------------
     // VAGAS
     // O site publico consulta where('ativa', '==', true) sem estar logado,
-    // entao a leitura precisa continuar aberta para as vagas publicadas.
-    // Escrever, so administrador.
+    // entao a leitura das vagas publicadas continua aberta.
+    // Mexer nas vagas exige a tela 'vagas' liberada.
     // ---------------------------------------------------------------
     match /vagas/{vagaId} {
-      allow read: if resource.data.ativa == true || ehAdmin();
-      allow list: if ehAdmin();
-      allow create, update, delete: if ehAdmin();
+      allow read: if resource.data.ativa == true || podeVer('vagas');
+      allow list: if podeVer('vagas');
+      allow create, update, delete: if podeVer('vagas');
     }
 
     // ---------------------------------------------------------------
     // ADMINS
-    // Cada admin precisa conseguir ler o proprio documento, senao o painel
-    // nao consegue confirmar que ele tem acesso. Escrever, so o dono.
+    // Cada admin le o proprio documento (o painel precisa disso para saber
+    // quais telas liberar). Listar e escrever, so o dono.
     // ---------------------------------------------------------------
     match /admins/{uid} {
-      allow get: if request.auth != null && (request.auth.uid == uid || ehAdmin());
+      allow get: if request.auth != null && (request.auth.uid == uid || ehDono());
+      allow list: if ehDono();
+      allow create, update, delete: if ehDono();
+    }
+
+    // ---------------------------------------------------------------
+    // LOGINS  (nome de usuario -> e-mail)
+    // Quem esta na tela de login ainda nao autenticou, entao precisa conseguir
+    // resolver o nome digitado. 'get' e liberado, mas 'list' nao: sem a lista,
+    // nao da para varrer a colecao atras de e-mails — e preciso acertar o nome.
+    // ---------------------------------------------------------------
+    match /logins/{usuario} {
+      allow get: if true;
       allow list: if ehDono();
       allow create, update, delete: if ehDono();
     }
@@ -51,7 +76,6 @@ service cloud.firestore {
     // ---------------------------------------------------------------
     // EMAILS
     // Gravados pela Cloud Function, que usa o Admin SDK e ignora estas regras.
-    // Nenhum cliente precisa escrever aqui.
     // ---------------------------------------------------------------
     match /emails/{emailId} {
       allow read: if ehAdmin();

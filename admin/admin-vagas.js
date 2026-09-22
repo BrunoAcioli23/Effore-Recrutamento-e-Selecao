@@ -5,6 +5,37 @@
 // firestore.rules, que repete este e-mail. Trocar o dono = mudar nos dois.
 const EMAIL_DONO = 'brunoeffore@outlook.com';
 
+// Telas que o dono pode liberar por pessoa, agrupadas como no menu.
+// A aba Usuários não entra aqui de propósito: ela é sempre só do dono.
+const SECOES_TELAS = [
+    {
+        secao: 'Principal',
+        telas: [
+            { chave: 'visao-geral', rotulo: 'Visão Geral' },
+            { chave: 'vagas', rotulo: 'Vagas' },
+            { chave: 'candidatos', rotulo: 'Candidatos' },
+            { chave: 'empresas', rotulo: 'Empresas' }
+        ]
+    },
+    {
+        secao: 'Conteúdo',
+        telas: [
+            { chave: 'blog', rotulo: 'Blog' },
+            { chave: 'marketing', rotulo: 'Marketing' },
+            { chave: 'contatos', rotulo: 'Contatos' }
+        ]
+    },
+    {
+        secao: 'Configurações',
+        telas: [
+            { chave: 'configuracoes', rotulo: 'Configurações' }
+        ]
+    }
+];
+
+const TODAS_AS_TELAS = SECOES_TELAS.reduce(
+    (lista, s) => lista.concat(s.telas.map((t) => t.chave)), []);
+
 const PAGINAS = {
     'visao-geral': {
         titulo: 'Visão Geral',
@@ -16,10 +47,21 @@ const PAGINAS = {
     },
     'usuarios': {
         titulo: 'Usuários',
-        subtitulo: 'Quem pode entrar no painel e mexer nas vagas',
+        subtitulo: 'Quem entra no painel e o que cada um enxerga',
         apenasDono: true
     }
 };
+
+// Nome de usuário para login: "Maria Silva" -> "maria.silva".
+// Sem acento nem espaço, porque vira o id de um documento no Firestore.
+function gerarUsuario(nome) {
+    return String(nome || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '.')
+        .replace(/^\.+|\.+$/g, '');
+}
 
 const FILTROS_VAGA = [
     { valor: 'todos', rotulo: 'Todas as vagas' },
@@ -48,9 +90,11 @@ const moedaBRL = new Intl.NumberFormat('pt-BR', {
 });
 
 class VagasManager {
-    constructor(user, ehDono) {
+    constructor(user, ehDono, permissoes) {
         this.user = user;
         this.ehDono = ehDono;
+        // O dono enxerga tudo; os demais, só o que foi marcado para eles.
+        this.permissoes = ehDono ? TODAS_AS_TELAS.slice() : (permissoes || []);
         this.admins = [];
         this.vagas = [];
         this.carregado = false;
@@ -58,7 +102,8 @@ class VagasManager {
         this.vagaEditandoId = null;
         this.termoBusca = '';
         this.periodoDias = 7;
-        this.paginaAtual = 'visao-geral';
+        this.telaAtual = this.primeiraTelaPermitida();
+        this.paginaAtual = this.telaAtual;
         this.filtro = 'todos';
         this.ordenacao = 'recentes';
         this.vagasCollection = db.collection('vagas');
@@ -71,7 +116,11 @@ class VagasManager {
         this.mostrarPagina(this.paginaAtual);
         this.renderizarTudo();
 
-        if (this.ehDono) this.escutarAdmins();
+        if (this.ehDono) {
+            const caixa = document.getElementById('telas-novo-usuario');
+            if (caixa) caixa.innerHTML = this.htmlTelas('novo', ['visao-geral', 'vagas']);
+            this.escutarAdmins();
+        }
 
         // Listener em tempo real (também faz a carga inicial)
         this.vagasCollection.onSnapshot(
@@ -113,12 +162,25 @@ class VagasManager {
         document.getElementById('btn-nova-vaga').addEventListener('click', () => this.abrirModalNova());
         document.getElementById('btn-nova-vaga-topo').addEventListener('click', () => this.abrirModalNova());
 
-        // Criacao de acesso (so renderizado para o dono)
+        // Criacao de acesso (so usada pelo dono)
         const formUsuario = document.getElementById('form-usuario');
         if (formUsuario) {
             formUsuario.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.criarUsuario();
+            });
+
+            // Mostra o login que sera gerado enquanto o nome e digitado,
+            // sem sobrescrever se o dono preferir escolher a mao.
+            const campoNome = document.getElementById('usuario-nome');
+            const campoLogin = document.getElementById('usuario-login');
+            campoNome.addEventListener('input', () => {
+                if (!campoLogin.dataset.editado) {
+                    campoLogin.value = gerarUsuario(campoNome.value);
+                }
+            });
+            campoLogin.addEventListener('input', () => {
+                campoLogin.dataset.editado = campoLogin.value ? '1' : '';
             });
         }
 
@@ -179,13 +241,27 @@ class VagasManager {
 
     // ===================== PERMISSOES =====================
 
-    // Esconder a aba e conveniencia, nao seguranca: o firestore.rules e que
-    // recusa a escrita em /admins para qualquer um que nao seja o dono.
+    podeVer(tela) {
+        if (tela === 'usuarios') return this.ehDono;
+        return this.ehDono || this.permissoes.includes(tela);
+    }
+
+    primeiraTelaPermitida() {
+        return TODAS_AS_TELAS.find((t) => this.podeVer(t)) || 'sem-acesso';
+    }
+
+    // Esconder do menu e conveniencia, nao seguranca: o firestore.rules e que
+    // recusa a leitura e a escrita de quem nao tem a tela liberada.
     aplicarPermissoes() {
-        const navUsuarios = document.getElementById('nav-usuarios');
-        if (navUsuarios) {
-            navUsuarios.classList.toggle('oculto', !this.ehDono);
-        }
+        document.querySelectorAll('.nav-item').forEach((item) => {
+            item.classList.toggle('oculto', !this.podeVer(item.dataset.page));
+        });
+
+        // Secao inteira sem nenhuma tela liberada some junto com o titulo
+        document.querySelectorAll('.nav-section').forEach((secao) => {
+            const visiveis = secao.querySelectorAll('.nav-item:not(.oculto)').length;
+            secao.classList.toggle('oculto', visiveis === 0);
+        });
 
         const email = this.user.email || 'sem e-mail';
         const inicial = email.charAt(0).toUpperCase();
@@ -203,12 +279,13 @@ class VagasManager {
     // ===================== ROTEAMENTO =====================
 
     mostrarPagina(pagina) {
-        // Digitar a pagina no console nao deve abrir o que o usuario nao pode ver
-        if (PAGINAS[pagina] && PAGINAS[pagina].apenasDono && !this.ehDono) {
-            pagina = 'visao-geral';
+        // Digitar a pagina no console nao deve abrir o que a pessoa nao pode ver
+        if (!this.podeVer(pagina)) {
+            pagina = this.primeiraTelaPermitida();
         }
 
         const conhecida = Object.prototype.hasOwnProperty.call(PAGINAS, pagina);
+        this.telaAtual = pagina;
         this.paginaAtual = conhecida ? pagina : 'em-breve';
 
         document.querySelectorAll('.nav-item').forEach((item) => {
@@ -1132,18 +1209,36 @@ class VagasManager {
             </div>
         `;
 
-        const linhas = this.admins.map((a) => `
-            <div class="usuario-item">
-                <div class="user-avatar">${this.escapar(String(a.nome || a.email || '?').charAt(0).toUpperCase())}</div>
-                <div class="usuario-info">
-                    <strong>${this.escapar(a.nome || a.email)}</strong>
-                    <span>${this.escapar(a.email)}${a.criadoEm ? ' &middot; desde ' + this.formatarData(a.criadoEm) : ''}</span>
+        const linhas = this.admins.map((a) => {
+            const telas = Array.isArray(a.permissoes) ? a.permissoes : [];
+            const nomes = telas.length
+                ? telas.map((t) => this.rotuloTela(t)).join(', ')
+                : 'nenhuma tela liberada';
+            return `
+            <div class="usuario-bloco">
+                <div class="usuario-item">
+                    <div class="user-avatar">${this.escapar(String(a.nome || a.usuario || '?').charAt(0).toUpperCase())}</div>
+                    <div class="usuario-info">
+                        <strong>${this.escapar(a.nome || a.usuario)}</strong>
+                        <span>entra como <code>${this.escapar(a.usuario || a.email)}</code>${a.criadoEm ? ' &middot; desde ' + this.formatarData(a.criadoEm) : ''}</span>
+                        <span class="usuario-telas">${this.escapar(nomes)}</span>
+                    </div>
+                    <button class="btn-action btn-edit btn-telas" data-uid="${this.escapar(a.uid)}" title="Alterar telas" aria-label="Alterar telas">
+                        <i class="fas fa-sliders"></i>
+                    </button>
+                    <button class="btn-action btn-delete" data-uid="${this.escapar(a.uid)}" data-nome="${this.escapar(a.nome || a.usuario)}" title="Remover acesso" aria-label="Remover acesso">
+                        <i class="fas fa-user-minus"></i>
+                    </button>
                 </div>
-                <button class="btn-action btn-delete" data-uid="${this.escapar(a.uid)}" data-nome="${this.escapar(a.nome || a.email)}" title="Remover acesso" aria-label="Remover acesso">
-                    <i class="fas fa-user-minus"></i>
-                </button>
+                <div class="usuario-editor" id="editor-${this.escapar(a.uid)}" hidden>
+                    ${this.htmlTelas('edit-' + a.uid, telas)}
+                    <button class="btn-primary btn-salvar-telas" data-uid="${this.escapar(a.uid)}">
+                        <i class="fas fa-save"></i> Salvar telas
+                    </button>
+                </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
 
         container.innerHTML = linhaDono + linhas;
 
@@ -1153,20 +1248,94 @@ class VagasManager {
                 this.removerUsuario(uid, nome);
             });
         });
+
+        container.querySelectorAll('.btn-telas').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                const editor = document.getElementById('editor-' + e.currentTarget.dataset.uid);
+                if (editor) editor.hidden = !editor.hidden;
+            });
+        });
+
+        container.querySelectorAll('.btn-salvar-telas').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                this.salvarTelas(e.currentTarget.dataset.uid);
+            });
+        });
+    }
+
+    rotuloTela(chave) {
+        for (const secao of SECOES_TELAS) {
+            const tela = secao.telas.find((t) => t.chave === chave);
+            if (tela) return tela.rotulo;
+        }
+        return chave;
+    }
+
+    // Checkboxes de telas, agrupados como no menu lateral
+    htmlTelas(prefixo, marcadas) {
+        return `
+            <div class="telas-grid">
+                ${SECOES_TELAS.map((secao) => `
+                    <div class="telas-secao">
+                        <div class="telas-secao-titulo">${this.escapar(secao.secao)}</div>
+                        ${secao.telas.map((t) => `
+                            <div class="benefit-item">
+                                <input type="checkbox" class="benefit-checkbox tela-checkbox"
+                                       id="${prefixo}-${t.chave}" value="${t.chave}"
+                                       ${marcadas.includes(t.chave) ? 'checked' : ''}>
+                                <label class="benefit-label" for="${prefixo}-${t.chave}">${this.escapar(t.rotulo)}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    telasMarcadas(escopo) {
+        return [...escopo.querySelectorAll('.tela-checkbox:checked')].map((cb) => cb.value);
+    }
+
+    async salvarTelas(uid) {
+        const editor = document.getElementById('editor-' + uid);
+        if (!editor) return;
+
+        const permissoes = this.telasMarcadas(editor);
+
+        try {
+            await db.collection('admins').doc(uid).update({ permissoes });
+            editor.hidden = true;
+            this.mostrarNotificacao('Telas atualizadas.', 'success');
+        } catch (error) {
+            console.error('Erro ao salvar telas:', error);
+            this.mostrarNotificacao('Erro ao salvar telas: ' + error.message, 'error');
+        }
     }
 
     async criarUsuario() {
         const nome = document.getElementById('usuario-nome').value.trim();
+        const usuario = gerarUsuario(document.getElementById('usuario-login').value || nome);
         const email = document.getElementById('usuario-email').value.trim().toLowerCase();
         const senha = document.getElementById('usuario-senha').value;
+        const permissoes = this.telasMarcadas(document.getElementById('form-usuario'));
 
         if (!nome || !email || senha.length < 6) {
             this.mostrarNotificacao('Preencha nome, e-mail e uma senha de pelo menos 6 caracteres.', 'error');
             return;
         }
 
+        if (!usuario) {
+            this.mostrarNotificacao('O nome precisa ter ao menos uma letra ou número para virar um login.', 'error');
+            return;
+        }
+
         if (email === EMAIL_DONO) {
             this.mostrarNotificacao('Este e-mail já é o dono do painel.', 'error');
+            return;
+        }
+
+        if (!permissoes.length) {
+            this.mostrarNotificacao('Marque pelo menos uma tela, senão a pessoa entra e não vê nada.', 'error');
             return;
         }
 
@@ -1180,18 +1349,31 @@ class VagasManager {
         const appSecundario = firebase.initializeApp(firebaseConfig, 'criar-usuario-' + Date.now());
 
         try {
+            const jaExiste = await db.collection('logins').doc(usuario).get();
+            if (jaExiste.exists) {
+                throw { code: 'login-em-uso' };
+            }
+
             const cred = await appSecundario.auth().createUserWithEmailAndPassword(email, senha);
 
             await db.collection('admins').doc(cred.user.uid).set({
                 nome,
+                usuario,
                 email,
+                permissoes,
                 criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
                 criadoPor: this.user.email
             });
 
+            // Mapa nome -> e-mail, lido pela tela de login antes de autenticar
+            await db.collection('logins').doc(usuario).set({
+                email,
+                uid: cred.user.uid
+            });
+
             await appSecundario.auth().signOut();
             document.getElementById('form-usuario').reset();
-            this.mostrarNotificacao(`Acesso criado para ${nome}.`, 'success');
+            this.mostrarNotificacao(`Acesso criado. ${nome} entra com o usuário "${usuario}".`, 'success');
         } catch (error) {
             console.error('Erro ao criar usuário:', error);
             this.mostrarNotificacao(this.mensagemErroAuth(error), 'error');
@@ -1204,6 +1386,8 @@ class VagasManager {
 
     mensagemErroAuth(error) {
         switch (error.code) {
+            case 'login-em-uso':
+                return 'Já existe alguém com esse nome de usuário. Ajuste o campo "Usuário".';
             case 'auth/email-already-in-use':
                 return 'Já existe uma conta com esse e-mail. Se a pessoa deveria ter acesso, peça o UID dela no Console do Firebase.';
             case 'auth/invalid-email':
@@ -1225,7 +1409,11 @@ class VagasManager {
         }
 
         try {
+            const admin = this.admins.find((a) => a.uid === uid);
             await db.collection('admins').doc(uid).delete();
+            if (admin && admin.usuario) {
+                await db.collection('logins').doc(admin.usuario).delete();
+            }
             this.mostrarNotificacao(`${nome} não tem mais acesso ao painel.`, 'success');
         } catch (error) {
             console.error('Erro ao remover usuário:', error);
@@ -1322,7 +1510,7 @@ class VagasManager {
         }
 
         const beneficios = [];
-        document.querySelectorAll('.benefit-checkbox:checked').forEach((cb) => beneficios.push(cb.value));
+        document.querySelectorAll('#form-vaga .benefit-checkbox:checked').forEach((cb) => beneficios.push(cb.value));
 
         const vaga = {
             titulo,
@@ -1391,7 +1579,7 @@ class VagasManager {
     limparFormulario() {
         document.getElementById('form-vaga').reset();
         document.getElementById('vaga-id').value = '';
-        document.querySelectorAll('.benefit-checkbox').forEach((cb) => {
+        document.querySelectorAll('#form-vaga .benefit-checkbox').forEach((cb) => {
             cb.checked = false;
         });
     }
@@ -1413,7 +1601,7 @@ class VagasManager {
         document.getElementById('vaga-descricao').value = vaga.descricao || '';
 
         if (Array.isArray(vaga.beneficios)) {
-            document.querySelectorAll('.benefit-checkbox').forEach((cb) => {
+            document.querySelectorAll('#form-vaga .benefit-checkbox').forEach((cb) => {
                 cb.checked = vaga.beneficios.includes(cb.value);
             });
         }
@@ -1462,24 +1650,29 @@ async function iniciarPainel(user) {
     const email = (user.email || '').toLowerCase();
     const ehDono = email === EMAIL_DONO;
     let autorizado = ehDono;
+    let permissoes = [];
 
     if (!autorizado) {
         try {
             const doc = await db.collection('admins').doc(user.uid).get();
-            autorizado = doc.exists;
+            if (doc.exists) {
+                autorizado = true;
+                permissoes = doc.data().permissoes || [];
+            }
         } catch (erro) {
             console.error('Erro ao verificar permissão:', erro);
             autorizado = false;
         }
     }
 
-    if (!autorizado) {
+    // Conta cadastrada mas sem nenhuma tela liberada nao tem o que fazer aqui
+    if (!autorizado || (!ehDono && permissoes.length === 0)) {
         await auth.signOut().catch(() => {});
         window.location.href = './?erro=sem-acesso';
         return;
     }
 
-    vagasManager = new VagasManager(user, ehDono);
+    vagasManager = new VagasManager(user, ehDono, permissoes);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
