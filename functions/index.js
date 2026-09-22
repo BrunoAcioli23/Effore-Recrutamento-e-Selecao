@@ -131,7 +131,7 @@ function gerarEmailHTML(data, tipo) {
                         </tr>
                         <tr>
                             <td style="padding: 12px; border-bottom: 1px solid #E4E0D8;"><strong style="color: #2A323E;">Currículo:</strong></td>
-                            <td style="padding: 12px; border-bottom: 1px solid #E4E0D8; color: #5C6673;">${curriculo || 'Não enviado'}</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #E4E0D8; color: #5C6673;">${data.anexo && data.anexo.nome ? `📎 ${data.anexo.nome} (em anexo neste e-mail)` : (curriculo || 'Não enviado')}</td>
                         </tr>
                     </table>
                 </td>
@@ -200,10 +200,31 @@ exports.enviarEmail = onRequest({cors: true}, async (req, res) => {
 
             // Validação básica
             if (!tipo || !data.nome || !data.email) {
-                return res.status(400).json({ 
+                return res.status(400).json({
                     error: 'Dados incompletos',
                     required: ['tipo', 'nome', 'email']
                 });
+            }
+
+            // O anexo chega em base64 dentro do JSON (o Storage não está
+            // habilitado no projeto). Base64 infla ~33%, então 7 MB aqui
+            // corresponde ao limite de 5 MB que o site aplica no arquivo.
+            if (data.anexo && data.anexo.conteudo) {
+                if (data.anexo.conteudo.length > 7 * 1024 * 1024) {
+                    return res.status(413).json({
+                        error: 'Arquivo muito grande',
+                        message: 'O currículo excede o limite de 5 MB.'
+                    });
+                }
+
+                const permitidos = ['pdf', 'doc', 'docx'];
+                const extensao = String(data.anexo.nome || '').split('.').pop().toLowerCase();
+                if (!permitidos.includes(extensao)) {
+                    return res.status(400).json({
+                        error: 'Formato não aceito',
+                        message: 'Envie o currículo em PDF, DOC ou DOCX.'
+                    });
+                }
             }
 
             // Gerar HTML do email
@@ -219,17 +240,49 @@ exports.enviarEmail = onRequest({cors: true}, async (req, res) => {
                 text: `Nova mensagem de ${data.nome} (${data.email})`
             };
 
+            if (data.anexo && data.anexo.conteudo) {
+                mailOptions.attachments = [{
+                    filename: data.anexo.nome || 'curriculo',
+                    content: data.anexo.conteudo,
+                    encoding: 'base64',
+                    contentType: data.anexo.tipo || 'application/octet-stream'
+                }];
+            }
+
             // Enviar email
             await transporter.sendMail(mailOptions);
+
+            // O documento do Firestore tem limite de 1 MB, então o conteúdo do
+            // arquivo fica de fora do backup — só o nome dele é registrado.
+            const { anexo, ...dadosSemArquivo } = data;
+            const dadosParaSalvar = anexo
+                ? { ...dadosSemArquivo, anexoNome: anexo.nome || null }
+                : dadosSemArquivo;
 
             // Salvar no Firestore para backup
             await admin.firestore().collection('emails').add({
                 tipo,
-                data,
+                data: dadosParaSalvar,
                 assunto,
                 status: 'enviado',
                 timestamp: admin.firestore.FieldValue.serverTimestamp()
             });
+
+            // Candidaturas também viram registro próprio, para alimentar a aba
+            // Candidatos do painel. Escrito pelo Admin SDK, que ignora as regras.
+            if (tipo === 'candidatura') {
+                await admin.firestore().collection('candidaturas').add({
+                    nome: data.nome,
+                    email: data.email,
+                    telefone: data.telefone || '',
+                    linkedin: data.linkedin || '',
+                    vaga: data.vaga || '',
+                    vagaId: data.vagaId || '',
+                    curriculoNome: anexo ? (anexo.nome || '') : '',
+                    origem: data.origem || '',
+                    criadoEm: admin.firestore.FieldValue.serverTimestamp()
+                });
+            }
 
             console.log('✅ Email enviado com sucesso:', assunto);
 
@@ -241,10 +294,13 @@ exports.enviarEmail = onRequest({cors: true}, async (req, res) => {
         } catch (error) {
             console.error('❌ Erro ao enviar email:', error);
             
-            // Salvar erro no Firestore
+            // Salvar erro no Firestore (sem o arquivo, que estoura 1 MB)
+            const { anexo: anexoErro, ...corpoSemArquivo } = req.body || {};
             await admin.firestore().collection('emails').add({
-                tipo: req.body.tipo,
-                data: req.body,
+                tipo: req.body ? req.body.tipo : null,
+                data: anexoErro
+                    ? { ...corpoSemArquivo, anexoNome: anexoErro.nome || null }
+                    : corpoSemArquivo,
                 status: 'erro',
                 error: error.message,
                 timestamp: admin.firestore.FieldValue.serverTimestamp()

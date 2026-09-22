@@ -74,6 +74,17 @@ service cloud.firestore {
     }
 
     // ---------------------------------------------------------------
+    // CANDIDATURAS
+    // Gravadas pela Cloud Function (Admin SDK, ignora estas regras) quando
+    // alguem se candidata pelo site. O cliente nunca escreve aqui direto,
+    // entao nao ha como poluir a colecao de fora.
+    // ---------------------------------------------------------------
+    match /candidaturas/{id} {
+      allow read: if podeVer('candidatos');
+      allow write: if false;
+    }
+
+    // ---------------------------------------------------------------
     // EMAILS
     // Gravados pela Cloud Function, que usa o Admin SDK e ignora estas regras.
     // ---------------------------------------------------------------

@@ -10,6 +10,9 @@ class VagasDisplay {
     async inicializar() {
         await this.carregarVagas();
         this.configurarFiltros();
+        // Tambem apos a carga inicial: se o snapshot demorar (ou falhar),
+        // quem veio pelo link da home ja ve o modal.
+        this.abrirVagaDaURL();
         
         // Listener em tempo real para mudanças (sem orderBy para evitar erro de índice)
         db.collection('vagas').where('ativa', '==', true).onSnapshot((snapshot) => {
@@ -29,7 +32,22 @@ class VagasDisplay {
             });
             this.vagasFiltradas = [...this.vagas];
             this.renderizarVagas();
+            this.abrirVagaDaURL();
         });
+    }
+
+    // Quem chega de /pages/vagas?vaga=<id> (link da home) ja ve o modal aberto
+    abrirVagaDaURL() {
+        if (this.vagaDaURLAberta) return;
+
+        const id = new URLSearchParams(window.location.search).get('vaga');
+        if (!id) return;
+
+        const vaga = this.vagas.find((v) => v.id === id);
+        if (!vaga) return;
+
+        this.vagaDaURLAberta = true;
+        abrirModalDetalhes(id);
     }
 
     async carregarVagas() {
@@ -296,26 +314,180 @@ function fecharModalDetalhes() {
     document.body.style.overflow = 'auto';
 }
 
-// Função para rolar até o formulário
-function scrollToFormulario() {
-    fecharModalDetalhes();
-    const formulario = document.getElementById('banco-talentos');
-    if (formulario) {
-        formulario.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// ===================================
+// CANDIDATURA
+// ===================================
+
+const CANDIDATURA_URL = 'https://us-central1-effore-recursos-humanos.cloudfunctions.net/enviarEmail';
+const TAMANHO_MAXIMO_CV = 5 * 1024 * 1024; // 5 MB
+
+let vagaEmCandidatura = null;
+
+// Vem do botao "Candidatar-se Agora" dentro do modal de detalhes
+function abrirModalCandidatura() {
+    const titulo = document.getElementById('modal-titulo-vaga').textContent;
+    vagaEmCandidatura = {
+        id: (vagasDisplayInstance.vagas.find((v) => v.titulo === titulo) || {}).id || '',
+        titulo
+    };
+
+    document.getElementById('candidatura-vaga-titulo').textContent = titulo;
+    document.getElementById('cand-vaga-id').value = vagaEmCandidatura.id;
+    document.getElementById('cand-vaga-titulo').value = titulo;
+
+    // O modal de detalhes fecha, mas sem liberar o scroll do body:
+    // o de candidatura assume no lugar dele.
+    document.getElementById('modal-detalhes-vaga').style.display = 'none';
+    document.getElementById('modal-candidatura').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    document.getElementById('cand-nome').focus();
+}
+
+function fecharModalCandidatura() {
+    document.getElementById('modal-candidatura').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    mostrarErroCandidatura('');
+}
+
+function fecharModalCandidaturaOk() {
+    document.getElementById('modal-candidatura-ok').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function mostrarErroCandidatura(mensagem) {
+    const caixa = document.getElementById('cand-erro');
+    caixa.textContent = mensagem;
+    caixa.style.display = mensagem ? 'block' : 'none';
+}
+
+// O arquivo viaja em base64 dentro do JSON da Cloud Function, que o anexa
+// ao e-mail. E o caminho possivel sem o Firebase Storage habilitado.
+function lerArquivoBase64(arquivo) {
+    return new Promise((resolve, reject) => {
+        const leitor = new FileReader();
+        leitor.onload = () => resolve(String(leitor.result).split(',')[1]);
+        leitor.onerror = () => reject(new Error('Não foi possível ler o arquivo.'));
+        leitor.readAsDataURL(arquivo);
+    });
+}
+
+function formatarTamanho(bytes) {
+    return bytes < 1024 * 1024
+        ? `${Math.round(bytes / 1024)} KB`
+        : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+async function enviarCandidatura(evento) {
+    evento.preventDefault();
+    mostrarErroCandidatura('');
+
+    const arquivo = document.getElementById('cand-curriculo').files[0];
+
+    if (!arquivo) {
+        mostrarErroCandidatura('Anexe seu currículo para continuar.');
+        return;
+    }
+
+    if (arquivo.size > TAMANHO_MAXIMO_CV) {
+        mostrarErroCandidatura(
+            `O currículo tem ${formatarTamanho(arquivo.size)}. O limite é 5 MB.`);
+        return;
+    }
+
+    const extensoes = ['pdf', 'doc', 'docx'];
+    const extensao = arquivo.name.split('.').pop().toLowerCase();
+    if (!extensoes.includes(extensao)) {
+        mostrarErroCandidatura('Envie o currículo em PDF, DOC ou DOCX.');
+        return;
+    }
+
+    const botao = document.getElementById('btn-enviar-candidatura');
+    const original = botao.innerHTML;
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Enviando...';
+
+    try {
+        const base64 = await lerArquivoBase64(arquivo);
+
+        const resposta = await fetch(CANDIDATURA_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tipo: 'candidatura',
+                nome: document.getElementById('cand-nome').value.trim(),
+                email: document.getElementById('cand-email').value.trim(),
+                telefone: document.getElementById('cand-telefone').value.trim(),
+                linkedin: document.getElementById('cand-linkedin').value.trim(),
+                vaga: document.getElementById('cand-vaga-titulo').value,
+                vagaId: document.getElementById('cand-vaga-id').value,
+                anexo: {
+                    nome: arquivo.name,
+                    tipo: arquivo.type || 'application/octet-stream',
+                    conteudo: base64
+                },
+                origem: window.location.pathname
+            })
+        });
+
+        if (!resposta.ok) {
+            const erro = await resposta.json().catch(() => ({}));
+            throw new Error(erro.message || 'O servidor recusou o envio.');
+        }
+
+        document.getElementById('ok-vaga-titulo').textContent =
+            document.getElementById('cand-vaga-titulo').value;
+        document.getElementById('form-candidatura').reset();
+        document.getElementById('cand-arquivo-info').textContent = '';
+        document.getElementById('modal-candidatura').style.display = 'none';
+        document.getElementById('modal-candidatura-ok').style.display = 'block';
+
+    } catch (erro) {
+        console.error('Erro ao enviar candidatura:', erro);
+        mostrarErroCandidatura(
+            'Não conseguimos enviar sua candidatura. Tente novamente em instantes.');
+    } finally {
+        botao.disabled = false;
+        botao.innerHTML = original;
     }
 }
 
-// Fechar modal ao clicar fora dele
-document.addEventListener('click', (e) => {
-    const modal = document.getElementById('modal-detalhes-vaga');
-    if (e.target === modal) {
-        fecharModalDetalhes();
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form-candidatura');
+    if (form) form.addEventListener('submit', enviarCandidatura);
+
+    const campoArquivo = document.getElementById('cand-curriculo');
+    if (campoArquivo) {
+        campoArquivo.addEventListener('change', () => {
+            const arquivo = campoArquivo.files[0];
+            document.getElementById('cand-arquivo-info').textContent =
+                arquivo ? `${arquivo.name} — ${formatarTamanho(arquivo.size)}` : '';
+        });
     }
 });
 
-// Fechar modal com ESC
+// Fechar ao clicar no fundo escuro
+document.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modal-detalhes-vaga')) {
+        fecharModalDetalhes();
+    }
+    // O de candidatura tem formulario preenchido: so fecha pelo X ou Cancelar,
+    // para nao perder o que a pessoa digitou com um clique fora.
+    if (e.target === document.getElementById('modal-candidatura-ok')) {
+        fecharModalCandidaturaOk();
+    }
+});
+
+// Fechar com ESC o modal que estiver por cima
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+    if (e.key !== 'Escape') return;
+
+    const visivel = (id) => document.getElementById(id).style.display === 'block';
+
+    if (visivel('modal-candidatura-ok')) {
+        fecharModalCandidaturaOk();
+    } else if (visivel('modal-candidatura')) {
+        fecharModalCandidatura();
+    } else {
         fecharModalDetalhes();
     }
 });

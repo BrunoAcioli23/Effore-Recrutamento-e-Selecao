@@ -44,8 +44,17 @@
     --font-primary: 'Poppins', sans-serif;
 }
 
+/* ===== BARRA DE ROLAGEM ===== */
+/* Marinho + dourado do logo. Firefox so aceita as duas propriedades abaixo;
+   o resto do mundo usa os seletores -webkit-. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold) var(--color-cream);
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -54,11 +63,24 @@
 
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background: 
-    linear-gradient(to bottom,
-      var(--color-cream) 20%,
-      var(--color-gold) 100%
-    );
+  border: 2px solid var(--color-cream);
+  background: linear-gradient(
+    to bottom,
+    var(--color-gold-light) 0%,
+    var(--color-gold) 100%
+  );
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    var(--color-gold) 0%,
+    var(--color-navy) 100%
+  );
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--color-cream);
 }
 
 html {

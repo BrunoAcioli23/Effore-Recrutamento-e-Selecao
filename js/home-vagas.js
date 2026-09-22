@@ -125,7 +125,7 @@ class HomeVagasDisplay {
                         
                         ${beneficiosHTML}
                     </div>
-                    <a href="vagas.html#vagas-abertas" class="btn btn-outline">Ver Detalhes</a>
+                    <a href="/pages/vagas?vaga=${vaga.id}#vagas-abertas" class="btn btn-outline">Ver Detalhes</a>
                 </div>
             `;
         }).join('');

@@ -18,6 +18,32 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) var(--cream);
+        }
+
+        /* ===== BARRA DE ROLAGEM ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cream);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            border: 2px solid var(--cream);
+            background: linear-gradient(to bottom, var(--gold-light) 0%, var(--gold) 100%);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--gold) 0%, var(--navy) 100%);
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: var(--cream);
         }
 
         :root {
@@ -1818,16 +1844,6 @@
 
         <!-- ============ PÁGINA: USUÁRIOS (só o dono) ============ -->
         <section class="page" data-page="usuarios">
-            <div class="aviso">
-                <i class="fas fa-shield-halved"></i>
-                <div>
-                    <strong>Quem aparece aqui consegue entrar no painel e mexer nas vagas.</strong><br>
-                    Esta aba só é visível para você. Quem for removido perde o acesso na hora,
-                    mas a conta continua existindo no Firebase Authentication — para apagar a
-                    conta em definitivo é preciso ir ao Console do Firebase.
-                </div>
-            </div>
-
             <div class="table-section">
                 <div class="table-header">
                     <h3 class="chart-title">Criar novo acesso</h3>
@@ -1841,7 +1857,6 @@
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label" for="usuario-login">Usuário (para entrar)</label>
                             <input type="text" class="form-input" id="usuario-login" placeholder="maria.silva" autocomplete="off">
-                            <span class="campo-ajuda">Deixe vazio para gerar a partir do nome</span>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label" for="usuario-email">E-mail</label>
