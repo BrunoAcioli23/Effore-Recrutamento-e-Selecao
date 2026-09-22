@@ -5,6 +5,12 @@
 // firestore.rules, que repete este e-mail. Trocar o dono = mudar nos dois.
 const EMAIL_DONO = 'brunoeffore@outlook.com';
 
+// O Firebase Auth exige um e-mail para criar a conta, mesmo quando a pessoa
+// nao tem um. Quem for cadastrado sem e-mail ganha um endereco interno
+// (maria.silvaimperiorecursoshumanos.com.br) que existe so para o
+// login funcionar — ninguem escreve nem recebe nada nele.
+const DOMINIO_INTERNO = 'imperiorecursoshumanos.com.br';
+
 // Telas que o dono pode liberar por pessoa, agrupadas como no menu.
 // A aba Usuários não entra aqui de propósito: ela é sempre só do dono.
 const SECOES_TELAS = [
@@ -1220,7 +1226,7 @@ class VagasManager {
                     <div class="user-avatar">${this.escapar(String(a.nome || a.usuario || '?').charAt(0).toUpperCase())}</div>
                     <div class="usuario-info">
                         <strong>${this.escapar(a.nome || a.usuario)}</strong>
-                        <span>entra como <code>${this.escapar(a.usuario || a.email)}</code>${a.criadoEm ? ' &middot; desde ' + this.formatarData(a.criadoEm) : ''}</span>
+                        <span>entra como <code>${this.escapar(a.usuario || a.email)}</code>${a.email ? ' &middot; ' + this.escapar(a.email) : ' &middot; sem e-mail'}${a.criadoEm ? ' &middot; desde ' + this.formatarData(a.criadoEm) : ''}</span>
                         <span class="usuario-telas">${this.escapar(nomes)}</span>
                     </div>
                     <button class="btn-action btn-edit btn-telas" data-uid="${this.escapar(a.uid)}" title="Alterar telas" aria-label="Alterar telas">
@@ -1319,8 +1325,8 @@ class VagasManager {
         const senha = document.getElementById('usuario-senha').value;
         const permissoes = this.telasMarcadas(document.getElementById('form-usuario'));
 
-        if (!nome || !email || senha.length < 6) {
-            this.mostrarNotificacao('Preencha nome, e-mail e uma senha de pelo menos 6 caracteres.', 'error');
+        if (!nome || senha.length < 6) {
+            this.mostrarNotificacao('Preencha o nome e uma senha de pelo menos 6 caracteres.', 'error');
             return;
         }
 
@@ -1333,6 +1339,9 @@ class VagasManager {
             this.mostrarNotificacao('Este e-mail já é o dono do painel.', 'error');
             return;
         }
+
+        // Sem e-mail informado, a conta do Auth usa um endereco interno.
+        const emailLogin = email || `${usuario}@${DOMINIO_INTERNO}`;
 
         if (!permissoes.length) {
             this.mostrarNotificacao('Marque pelo menos uma tela, senão a pessoa entra e não vê nada.', 'error');
@@ -1354,20 +1363,21 @@ class VagasManager {
                 throw { code: 'login-em-uso' };
             }
 
-            const cred = await appSecundario.auth().createUserWithEmailAndPassword(email, senha);
+            const cred = await appSecundario.auth().createUserWithEmailAndPassword(emailLogin, senha);
 
             await db.collection('admins').doc(cred.user.uid).set({
                 nome,
                 usuario,
-                email,
+                email,            // e-mail de contato; vazio quando nao informado
+                emailLogin,       // o que o Firebase Auth realmente usa
                 permissoes,
                 criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
                 criadoPor: this.user.email
             });
 
-            // Mapa nome -> e-mail, lido pela tela de login antes de autenticar
+            // Mapa nome -> e-mail do Auth, lido pela tela de login antes de autenticar
             await db.collection('logins').doc(usuario).set({
-                email,
+                email: emailLogin,
                 uid: cred.user.uid
             });
 
