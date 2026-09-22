@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         auth.onAuthStateChanged((user) => {
             if (user) {
                 // Usuário já está logado, redirecionar para admin
-                window.location.href = 'admin.html';
+                window.location.href = 'painel.html';
             }
         });
 
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Login realizado com sucesso!', userCredential.user);
                 
                 // Redirecionar para página admin
-                window.location.href = 'admin.html';
+                window.location.href = 'painel.html';
                 
             } catch (error) {
                 console.error('Erro no login:', error);
