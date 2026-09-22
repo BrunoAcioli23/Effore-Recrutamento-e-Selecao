@@ -500,18 +500,35 @@
 
         .bar-item {
             flex: 1;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-end;
             gap: 8px;
+            min-width: 0;
+        }
+
+        /* A trilha da barra precisa de altura definida para o height:% da .bar resolver */
+        .bar-track {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
         }
 
         .bar {
             width: 100%;
             background: var(--accent-gradient);
             border-radius: 8px 8px 0 0;
+            min-height: 4px;
             position: relative;
             animation: growBar 1s ease-out;
+        }
+
+        .bar.vazia {
+            background: var(--border-color);
+            opacity: 0.6;
         }
 
         @keyframes growBar {
@@ -1041,6 +1058,411 @@
             color: var(--text-secondary);
             margin-bottom: 24px;
         }
+
+        /* ===== PAGINAS ===== */
+        .page {
+            display: none;
+        }
+
+        .page.show {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 28px 0 14px;
+        }
+
+        .metric-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .card-vazio {
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 18px 0;
+        }
+
+        .celula-vazia {
+            color: var(--text-secondary);
+        }
+
+        /* ===== ALERTAS / PENDENCIAS ===== */
+        .alert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .alert-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            text-align: left;
+            padding: 16px 18px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--border-color);
+            border-radius: 12px;
+            font: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alert-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(42, 50, 62, 0.1);
+        }
+
+        .alert-card.ok {
+            cursor: default;
+            border-left-color: #059669;
+        }
+
+        .alert-card.ok:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert-card.critico { border-left-color: #dc2626; }
+        .alert-card.atencao { border-left-color: #d97706; }
+        .alert-card.info    { border-left-color: var(--gold); }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--content-bg);
+            color: var(--navy-soft);
+            font-size: 16px;
+        }
+
+        .alert-card.critico .alert-icon { background: #fee2e2; color: #dc2626; }
+        .alert-card.atencao .alert-icon { background: #fef3c7; color: #92400e; }
+        .alert-card.info    .alert-icon { background: #F5EFE3; color: #7A5F37; }
+        .alert-card.ok      .alert-icon { background: #d1fae5; color: #059669; }
+
+        .alert-body {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .alert-body strong {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .alert-body span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .alert-seta {
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* ===== BENEFICIOS ===== */
+        .beneficio-linha {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0;
+        }
+
+        .beneficio-nome {
+            flex: 0 0 42%;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .beneficio-barra {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--content-bg);
+            overflow: hidden;
+        }
+
+        .beneficio-barra > span {
+            display: block;
+            height: 100%;
+            border-radius: 4px;
+            background: var(--accent-gradient);
+        }
+
+        .beneficio-count {
+            flex: 0 0 28px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ===== ULTIMAS VAGAS ===== */
+        .recente-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recente-item:last-child {
+            border-bottom: none;
+        }
+
+        .recente-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+
+        .recente-info strong {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .recente-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .recente-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .recente-data {
+            font-size: 12px;
+            color: var(--text-secondary);
+            min-width: 54px;
+            text-align: right;
+        }
+
+        /* ===== RANKING DE SALARIOS ===== */
+        .ranking-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+        }
+
+        .ranking-pos {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--content-bg);
+            color: var(--gold-dark);
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ranking-item:first-child .ranking-pos {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .ranking-corpo {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ranking-topo {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 7px;
+        }
+
+        .ranking-titulo {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ranking-valor {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--gold-dark);
+            white-space: nowrap;
+        }
+
+        .ranking-sub {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== FILTROS DA LISTA ===== */
+        .table-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .select-filtro {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .select-filtro:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .table-resultado {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        /* ===== TOASTS ===== */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 260px;
+            max-width: 380px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border-left: 4px solid #059669;
+            box-shadow: 0 8px 26px rgba(42, 50, 62, 0.18);
+            font-size: 14px;
+            color: var(--text-primary);
+            animation: toastEntra 0.25s ease-out;
+        }
+
+        .toast.error {
+            border-left-color: #dc2626;
+        }
+
+        .toast i {
+            color: #059669;
+        }
+
+        .toast.error i {
+            color: #dc2626;
+        }
+
+        .toast.saindo {
+            animation: toastSai 0.3s ease-in forwards;
+        }
+
+        @keyframes toastEntra {
+            from { opacity: 0; transform: translateX(24px); }
+        }
+
+        @keyframes toastSai {
+            to { opacity: 0; transform: translateX(24px); }
+        }
+
+        /* ===== TOPBAR ===== */
+        .btn-menu {
+            display: none;
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .topbar-user .user-avatar {
+            width: 34px;
+            height: 34px;
+            font-size: 13px;
+        }
+
+        .nav-badge.em-breve {
+            background: var(--content-bg);
+            color: var(--text-secondary);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        @media (max-width: 768px) {
+            .btn-menu {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .alert-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #toast-container {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+            }
+
+            .toast {
+                min-width: 0;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1051,10 +1473,10 @@
                 <img src="../assets/Logo-Agencia.png" alt="Effore Logo">
             </div>
             <div class="sidebar-user">
-                <div class="user-avatar">A</div>
+                <div class="user-avatar" id="user-avatar">·</div>
                 <div class="user-info">
                     <h4>Administrador</h4>
-                    <p>admin@effore.com</p>
+                    <p id="user-email">carregando...</p>
                 </div>
             </div>
         </div>
@@ -1062,7 +1484,11 @@
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
-                <a class="nav-item active" data-page="vagas">
+                <a class="nav-item active" data-page="visao-geral">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Visão Geral</span>
+                </a>
+                <a class="nav-item" data-page="vagas">
                     <i class="fas fa-briefcase"></i>
                     <span>Vagas</span>
                     <span class="nav-badge" id="vagas-count">0</span>
@@ -1070,10 +1496,12 @@
                 <a class="nav-item" data-page="candidatos">
                     <i class="fas fa-users"></i>
                     <span>Candidatos</span>
+                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
                 <a class="nav-item" data-page="empresas">
                     <i class="fas fa-building"></i>
                     <span>Empresas</span>
+                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
             </div>
 
@@ -1082,14 +1510,17 @@
                 <a class="nav-item" data-page="blog">
                     <i class="fas fa-newspaper"></i>
                     <span>Blog</span>
+                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
                 <a class="nav-item" data-page="marketing">
                     <i class="fas fa-bullhorn"></i>
                     <span>Marketing</span>
+                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
                 <a class="nav-item" data-page="contatos">
                     <i class="fas fa-envelope"></i>
                     <span>Contatos</span>
+                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
             </div>
 
@@ -1098,10 +1529,12 @@
                 <a class="nav-item" data-page="usuarios">
                     <i class="fas fa-user-shield"></i>
                     <span>Usuários</span>
+                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
                 <a class="nav-item" data-page="configuracoes">
                     <i class="fas fa-cog"></i>
                     <span>Configurações</span>
+                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
             </div>
         </nav>
@@ -1118,113 +1551,140 @@
     <div class="main-content">
         <!-- TOPBAR -->
         <div class="topbar">
+            <button class="btn-menu" id="btn-menu" aria-label="Abrir menu">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="topbar-title">
-                <h1>Gerenciamento de Vagas</h1>
-                <p>Visualize e gerencie todas as vagas cadastradas</p>
+                <h1 id="topbar-titulo">Visão Geral</h1>
+                <p id="topbar-subtitulo">Resumo do que está acontecendo nas suas vagas</p>
             </div>
             <div class="topbar-actions">
-                <button class="btn-icon">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">3</span>
-                </button>
-                <button class="btn-icon">
-                    <i class="fas fa-search"></i>
-                </button>
+                <span class="topbar-user">
+                    <span class="user-avatar" id="topbar-avatar">·</span>
+                    <span id="topbar-email"></span>
+                </span>
             </div>
         </div>
 
-        <!-- METRICS ROW -->
-        <div class="metrics-row">
-            <div class="metric-card">
-                <div class="metric-header">
-                    <div class="metric-icon purple">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                </div>
-                <div class="metric-value" id="total-vagas">0</div>
-                <div class="metric-label">Total de Vagas</div>
-            </div>
+        <!-- ============ PÁGINA: VISÃO GERAL ============ -->
+        <section class="page show" data-page="visao-geral">
+            <div class="metrics-row" id="vg-kpis"></div>
 
-            <div class="metric-card">
-                <div class="metric-header">
-                    <div class="metric-icon pink">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                </div>
-                <div class="metric-value" id="vagas-ativas">0</div>
-                <div class="metric-label">Publicadas no Site</div>
-            </div>
+            <div class="alert-grid" id="vg-alertas"></div>
 
-            <div class="metric-card">
-                <div class="metric-header">
-                    <div class="metric-icon blue">
-                        <i class="fas fa-file-contract"></i>
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">📊 Vagas Criadas por Período</h3>
+                        <div class="chart-filters">
+                            <button class="filter-btn active" data-dias="7">7 Dias</button>
+                            <button class="filter-btn" data-dias="30">30 Dias</button>
+                            <button class="filter-btn" data-dias="90">3 Meses</button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div class="bar-chart" id="vagas-periodo-chart"></div>
                     </div>
                 </div>
-                <div class="metric-value" id="vagas-clt">0</div>
-                <div class="metric-label">Vagas CLT</div>
-            </div>
 
-            <div class="metric-card">
-                <div class="metric-header">
-                    <div class="metric-icon yellow">
-                        <i class="fas fa-calendar-alt"></i>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">📄 Distribuição por Tipo de Contrato</h3>
                     </div>
-                    <div class="metric-trend" id="trend-este-mes"></div>
-                </div>
-                <div class="metric-value" id="vagas-este-mes">0</div>
-                <div class="metric-label">Criadas Este Mês</div>
-            </div>
-        </div>
-
-        <!-- CHARTS ROW -->
-        <div class="charts-row">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">📊 Produtividade - Vagas por Período</h3>
-                    <div class="chart-filters">
-                        <button class="filter-btn active" data-dias="7">7 Dias</button>
-                        <button class="filter-btn" data-dias="30">30 Dias</button>
-                        <button class="filter-btn" data-dias="90">3 Meses</button>
-                    </div>
-                </div>
-                <div class="chart-placeholder">
-                    <div class="bar-chart" id="vagas-periodo-chart">
-                        <!-- Será preenchido dinamicamente -->
-                    </div>
+                    <div class="distribution-list" id="vg-contratos"></div>
                 </div>
             </div>
 
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">📄 Distribuição por Tipo de Contrato</h3>
-                </div>
-                <div class="distribution-list" id="distribuicao-contrato">
-                    <!-- Será preenchido dinamicamente -->
-                </div>
-            </div>
-        </div>
-
-        <!-- TABLE SECTION -->
-        <div class="table-section">
-            <div class="table-header">
-                <h3 class="chart-title">Lista de Vagas</h3>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar vagas..." id="search-input">
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">📍 Cidades com Mais Vagas</h3>
                     </div>
-                    <button class="btn-primary" id="btn-nova-vaga">
-                        <i class="fas fa-plus"></i>
-                        Nova Vaga
-                    </button>
+                    <div class="distribution-list" id="vg-cidades"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">🎁 Benefícios Mais Oferecidos</h3>
+                    </div>
+                    <div id="vg-beneficios"></div>
                 </div>
             </div>
 
-            <div id="vagas-table-container">
-                <!-- Será preenchido dinamicamente -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h3 class="chart-title">Últimas Vagas Cadastradas</h3>
+                </div>
+                <div id="vg-recentes"></div>
             </div>
-        </div>
+        </section>
+
+        <!-- ============ PÁGINA: VAGAS ============ -->
+        <section class="page" data-page="vagas">
+            <div class="metrics-row" id="vagas-kpis"></div>
+
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">💰 Maiores Salários</h3>
+                    </div>
+                    <div id="vagas-ranking"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">📄 Distribuição por Tipo de Contrato</h3>
+                    </div>
+                    <div class="distribution-list" id="vagas-contratos"></div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h3 class="chart-title">Lista de Vagas</h3>
+                    <div class="table-tools">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar vagas..." id="search-input">
+                        </div>
+                        <select class="select-filtro" id="filtro-status" aria-label="Filtrar vagas">
+                            <option value="todos">Todas as vagas</option>
+                            <option value="publicadas">Publicadas no site</option>
+                            <option value="despublicadas">Despublicadas</option>
+                            <option value="nao-publicadas">Nunca publicadas</option>
+                            <option value="sem-salario">Sem salário informado</option>
+                            <option value="sem-descricao">Sem descrição</option>
+                            <option value="antigas">No ar há mais de 60 dias</option>
+                        </select>
+                        <select class="select-filtro" id="filtro-ordem" aria-label="Ordenar vagas">
+                            <option value="recentes">Mais recentes</option>
+                            <option value="antigas">Mais antigas</option>
+                            <option value="maior-salario">Maior salário</option>
+                            <option value="menor-salario">Menor salário</option>
+                            <option value="titulo">Título (A-Z)</option>
+                        </select>
+                        <button class="btn-primary" id="btn-nova-vaga">
+                            <i class="fas fa-plus"></i>
+                            Nova Vaga
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-resultado" id="vagas-resultado"></div>
+                <div id="vagas-table-container"></div>
+            </div>
+        </section>
+
+        <!-- ============ PÁGINA: EM BREVE ============ -->
+        <section class="page" data-page="em-breve">
+            <div class="table-section">
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+                    <h3 class="empty-title">Seção ainda não construída</h3>
+                    <p class="empty-text">Por enquanto o painel gerencia apenas as vagas.</p>
+                </div>
+            </div>
+        </section>
     </div>
 
     <!-- MODAL NOVA/EDITAR VAGA -->
@@ -1339,6 +1799,8 @@
         </div>
     </div>
 
+    <div id="toast-container" aria-live="polite"></div>
+
     <script src="firebase-config.js"></script>
     <script src="admin-vagas.js"></script>
     <script>
@@ -1346,7 +1808,16 @@
         auth.onAuthStateChanged((user) => {
             if (!user) {
                 window.location.href = './';
+                return;
             }
+
+            const email = user.email || 'sem e-mail';
+            const inicial = email.charAt(0).toUpperCase();
+
+            document.getElementById('user-email').textContent = email;
+            document.getElementById('user-avatar').textContent = inicial;
+            document.getElementById('topbar-email').textContent = email;
+            document.getElementById('topbar-avatar').textContent = inicial;
         });
 
         // Logout
@@ -1358,22 +1829,8 @@
             });
         });
 
-        // Navegação entre páginas
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                // Remove active de todos
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                // Adiciona active no clicado
-                this.classList.add('active');
-                
-                const page = this.dataset.page;
-                console.log('Navegar para:', page);
-                // Aqui você pode implementar a navegação entre diferentes páginas/seções
-            });
-        });
-
-        // O modal (abrir, fechar, limpar) e controlado pelo VagasManager em
-        // admin-vagas.js, que e quem sabe se ha uma vaga em edicao.
+        // A navegação da sidebar e o modal são controlados pelo VagasManager
+        // em admin-vagas.js, que é quem conhece o estado de cada página.
     </script>
 </body>
 </html>
