@@ -73,15 +73,18 @@
             width: 280px;
             height: 100vh;
             background: white;
-            padding: 24px 0;
+            padding: 24px 0 0;
             z-index: 100;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             transition: transform 0.3s ease;
             border-right: 2px solid var(--border-color);
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-header {
+            flex-shrink: 0;
             padding: 0 24px 24px;
             border-bottom: 2px solid var(--border-color);
             position: relative;
@@ -146,12 +149,20 @@
             font-size: 12px;
         }
 
+        /* Unica parte que rola; min-height:0 e o que permite encolher no flex */
         .sidebar-nav {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
             padding: 24px 0;
         }
 
         .nav-section {
             margin-bottom: 24px;
+        }
+
+        .nav-section:last-child {
+            margin-bottom: 0;
         }
 
         .nav-section-title {
@@ -208,10 +219,7 @@
         }
 
         .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            flex-shrink: 0;
             padding: 20px 24px;
             border-top: 2px solid var(--border-color);
             background: white;
@@ -1427,10 +1435,81 @@
             color: var(--text-secondary);
         }
 
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Atalho principal do painel: disponivel em qualquer aba */
+        #btn-nova-vaga-topo {
+            white-space: nowrap;
+            box-shadow: 0 4px 14px rgba(122, 95, 55, 0.25);
+        }
+
         .topbar-user .user-avatar {
             width: 34px;
             height: 34px;
             font-size: 13px;
+        }
+
+        /* ===== USUARIOS ===== */
+        .form-inline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            align-items: end;
+        }
+
+        .aviso {
+            display: flex;
+            gap: 12px;
+            padding: 16px 18px;
+            border-radius: 12px;
+            background: #FEF8EC;
+            border: 1px solid rgba(167, 134, 82, 0.3);
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .aviso i {
+            color: var(--gold-dark);
+            font-size: 16px;
+            margin-top: 2px;
+        }
+
+        .usuario-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .usuario-item:last-child {
+            border-bottom: none;
+        }
+
+        .usuario-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .usuario-info strong {
+            display: block;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .usuario-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .nav-item.oculto {
+            display: none;
         }
 
         .nav-badge.em-breve {
@@ -1446,6 +1525,14 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+            }
+
+            .topbar-user span:not(.user-avatar) {
+                display: none;
+            }
+
+            #btn-nova-vaga-topo span {
+                display: none;
             }
 
             .alert-grid {
@@ -1526,10 +1613,9 @@
 
             <div class="nav-section">
                 <div class="nav-section-title">Configurações</div>
-                <a class="nav-item" data-page="usuarios">
+                <a class="nav-item oculto" data-page="usuarios" id="nav-usuarios">
                     <i class="fas fa-user-shield"></i>
                     <span>Usuários</span>
-                    <span class="nav-badge em-breve">Em breve</span>
                 </a>
                 <a class="nav-item" data-page="configuracoes">
                     <i class="fas fa-cog"></i>
@@ -1559,6 +1645,10 @@
                 <p id="topbar-subtitulo">Resumo do que está acontecendo nas suas vagas</p>
             </div>
             <div class="topbar-actions">
+                <button class="btn-primary" id="btn-nova-vaga-topo">
+                    <i class="fas fa-plus"></i>
+                    <span>Nova Vaga</span>
+                </button>
                 <span class="topbar-user">
                     <span class="user-avatar" id="topbar-avatar">·</span>
                     <span id="topbar-email"></span>
@@ -1672,6 +1762,52 @@
 
                 <div class="table-resultado" id="vagas-resultado"></div>
                 <div id="vagas-table-container"></div>
+            </div>
+        </section>
+
+        <!-- ============ PÁGINA: USUÁRIOS (só o dono) ============ -->
+        <section class="page" data-page="usuarios">
+            <div class="aviso">
+                <i class="fas fa-shield-halved"></i>
+                <div>
+                    <strong>Quem aparece aqui consegue entrar no painel e mexer nas vagas.</strong><br>
+                    Esta aba só é visível para você. Quem for removido perde o acesso na hora,
+                    mas a conta continua existindo no Firebase Authentication — para apagar a
+                    conta em definitivo é preciso ir ao Console do Firebase.
+                </div>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h3 class="chart-title">Criar novo acesso</h3>
+                </div>
+                <form id="form-usuario">
+                    <div class="form-inline">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" for="usuario-nome">Nome</label>
+                            <input type="text" class="form-input" id="usuario-nome" placeholder="Ex: Maria Silva" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" for="usuario-email">E-mail</label>
+                            <input type="email" class="form-input" id="usuario-email" placeholder="maria@imperiorh.com.br" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" for="usuario-senha">Senha provisória</label>
+                            <input type="text" class="form-input" id="usuario-senha" placeholder="mínimo 6 caracteres" minlength="6" required autocomplete="off">
+                        </div>
+                        <button type="submit" class="btn-primary" id="btn-criar-usuario">
+                            <i class="fas fa-user-plus"></i>
+                            Criar acesso
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <div class="table-header">
+                    <h3 class="chart-title">Quem tem acesso ao painel</h3>
+                </div>
+                <div id="lista-usuarios"></div>
             </div>
         </section>
 
@@ -1804,21 +1940,8 @@
     <script src="firebase-config.js"></script>
     <script src="admin-vagas.js"></script>
     <script>
-        // Verificar autenticação
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                window.location.href = './';
-                return;
-            }
-
-            const email = user.email || 'sem e-mail';
-            const inicial = email.charAt(0).toUpperCase();
-
-            document.getElementById('user-email').textContent = email;
-            document.getElementById('user-avatar').textContent = inicial;
-            document.getElementById('topbar-email').textContent = email;
-            document.getElementById('topbar-avatar').textContent = inicial;
-        });
+        // A verificação de sessão e de permissão fica em admin-vagas.js: o painel
+        // só é montado depois de confirmar que a pessoa pode estar aqui.
 
         // Logout
         document.getElementById('btn-logout').addEventListener('click', () => {

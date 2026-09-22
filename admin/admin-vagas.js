@@ -1,5 +1,10 @@
 // Painel administrativo - visão geral e gerenciamento de vagas.
 
+// Unico e-mail que pode gerenciar quem tem acesso ao painel.
+// Isto aqui so controla o que aparece na tela; quem impede de verdade e o
+// firestore.rules, que repete este e-mail. Trocar o dono = mudar nos dois.
+const EMAIL_DONO = 'brunoeffore@outlook.com';
+
 const PAGINAS = {
     'visao-geral': {
         titulo: 'Visão Geral',
@@ -8,6 +13,11 @@ const PAGINAS = {
     'vagas': {
         titulo: 'Gerenciamento de Vagas',
         subtitulo: 'Métricas, faixas salariais e a lista completa'
+    },
+    'usuarios': {
+        titulo: 'Usuários',
+        subtitulo: 'Quem pode entrar no painel e mexer nas vagas',
+        apenasDono: true
     }
 };
 
@@ -38,7 +48,10 @@ const moedaBRL = new Intl.NumberFormat('pt-BR', {
 });
 
 class VagasManager {
-    constructor() {
+    constructor(user, ehDono) {
+        this.user = user;
+        this.ehDono = ehDono;
+        this.admins = [];
         this.vagas = [];
         this.carregado = false;
         this.erroCarga = null;
@@ -54,8 +67,11 @@ class VagasManager {
 
     inicializar() {
         this.configurarEventos();
+        this.aplicarPermissoes();
         this.mostrarPagina(this.paginaAtual);
         this.renderizarTudo();
+
+        if (this.ehDono) this.escutarAdmins();
 
         // Listener em tempo real (também faz a carga inicial)
         this.vagasCollection.onSnapshot(
@@ -93,8 +109,18 @@ class VagasManager {
             this.salvarVaga();
         });
 
-        // Modal
+        // Modal — dois botoes abrem o mesmo formulario
         document.getElementById('btn-nova-vaga').addEventListener('click', () => this.abrirModalNova());
+        document.getElementById('btn-nova-vaga-topo').addEventListener('click', () => this.abrirModalNova());
+
+        // Criacao de acesso (so renderizado para o dono)
+        const formUsuario = document.getElementById('form-usuario');
+        if (formUsuario) {
+            formUsuario.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.criarUsuario();
+            });
+        }
 
         document.getElementById('btn-cancelar').addEventListener('click', () => {
             if (confirm('Deseja realmente cancelar? Os dados preenchidos serão perdidos.')) {
@@ -151,9 +177,37 @@ class VagasManager {
         });
     }
 
+    // ===================== PERMISSOES =====================
+
+    // Esconder a aba e conveniencia, nao seguranca: o firestore.rules e que
+    // recusa a escrita em /admins para qualquer um que nao seja o dono.
+    aplicarPermissoes() {
+        const navUsuarios = document.getElementById('nav-usuarios');
+        if (navUsuarios) {
+            navUsuarios.classList.toggle('oculto', !this.ehDono);
+        }
+
+        const email = this.user.email || 'sem e-mail';
+        const inicial = email.charAt(0).toUpperCase();
+        const definir = (id, valor) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = valor;
+        };
+
+        definir('user-email', email);
+        definir('user-avatar', inicial);
+        definir('topbar-email', email);
+        definir('topbar-avatar', inicial);
+    }
+
     // ===================== ROTEAMENTO =====================
 
     mostrarPagina(pagina) {
+        // Digitar a pagina no console nao deve abrir o que o usuario nao pode ver
+        if (PAGINAS[pagina] && PAGINAS[pagina].apenasDono && !this.ehDono) {
+            pagina = 'visao-geral';
+        }
+
         const conhecida = Object.prototype.hasOwnProperty.call(PAGINAS, pagina);
         this.paginaAtual = conhecida ? pagina : 'em-breve';
 
@@ -405,6 +459,8 @@ class VagasManager {
             this.renderizarVisaoGeral();
         } else if (this.paginaAtual === 'vagas') {
             this.renderizarPaginaVagas();
+        } else if (this.paginaAtual === 'usuarios') {
+            this.renderizarUsuarios();
         }
     }
 
@@ -1029,6 +1085,154 @@ class VagasManager {
         `;
     }
 
+    // ===================== USUÁRIOS =====================
+
+    escutarAdmins() {
+        db.collection('admins').onSnapshot(
+            (snapshot) => {
+                this.admins = [];
+                snapshot.forEach((doc) => this.admins.push({ uid: doc.id, ...doc.data() }));
+                this.admins.sort((a, b) =>
+                    String(a.nome || a.email || '').localeCompare(String(b.nome || b.email || ''), 'pt-BR'));
+                if (this.paginaAtual === 'usuarios') this.renderizarUsuarios();
+            },
+            (erro) => {
+                console.error('Erro ao carregar administradores:', erro);
+                this.erroAdmins = erro.message;
+                if (this.paginaAtual === 'usuarios') this.renderizarUsuarios();
+            }
+        );
+    }
+
+    renderizarUsuarios() {
+        const container = document.getElementById('lista-usuarios');
+        if (!container) return;
+
+        if (this.erroAdmins) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                    <h3 class="empty-title">Não foi possível carregar a lista</h3>
+                    <p class="empty-text">${this.escapar(this.erroAdmins)}</p>
+                </div>
+            `;
+            return;
+        }
+
+        // O dono nao vive na colecao /admins — o acesso dele vem do e-mail,
+        // entao ele aparece como uma linha fixa que nao pode ser removida.
+        const linhaDono = `
+            <div class="usuario-item">
+                <div class="user-avatar">${this.escapar((this.user.email || '?').charAt(0).toUpperCase())}</div>
+                <div class="usuario-info">
+                    <strong>${this.escapar(this.user.email)}</strong>
+                    <span>Dono do painel &middot; acesso permanente</span>
+                </div>
+                <span class="status-badge active">Você</span>
+            </div>
+        `;
+
+        const linhas = this.admins.map((a) => `
+            <div class="usuario-item">
+                <div class="user-avatar">${this.escapar(String(a.nome || a.email || '?').charAt(0).toUpperCase())}</div>
+                <div class="usuario-info">
+                    <strong>${this.escapar(a.nome || a.email)}</strong>
+                    <span>${this.escapar(a.email)}${a.criadoEm ? ' &middot; desde ' + this.formatarData(a.criadoEm) : ''}</span>
+                </div>
+                <button class="btn-action btn-delete" data-uid="${this.escapar(a.uid)}" data-nome="${this.escapar(a.nome || a.email)}" title="Remover acesso" aria-label="Remover acesso">
+                    <i class="fas fa-user-minus"></i>
+                </button>
+            </div>
+        `).join('');
+
+        container.innerHTML = linhaDono + linhas;
+
+        container.querySelectorAll('.btn-delete').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                const { uid, nome } = e.currentTarget.dataset;
+                this.removerUsuario(uid, nome);
+            });
+        });
+    }
+
+    async criarUsuario() {
+        const nome = document.getElementById('usuario-nome').value.trim();
+        const email = document.getElementById('usuario-email').value.trim().toLowerCase();
+        const senha = document.getElementById('usuario-senha').value;
+
+        if (!nome || !email || senha.length < 6) {
+            this.mostrarNotificacao('Preencha nome, e-mail e uma senha de pelo menos 6 caracteres.', 'error');
+            return;
+        }
+
+        if (email === EMAIL_DONO) {
+            this.mostrarNotificacao('Este e-mail já é o dono do painel.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('btn-criar-usuario');
+        const original = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+
+        // createUserWithEmailAndPassword troca a sessao para o usuario recem-criado.
+        // Criar em uma instancia secundaria do Firebase evita derrubar o login do dono.
+        const appSecundario = firebase.initializeApp(firebaseConfig, 'criar-usuario-' + Date.now());
+
+        try {
+            const cred = await appSecundario.auth().createUserWithEmailAndPassword(email, senha);
+
+            await db.collection('admins').doc(cred.user.uid).set({
+                nome,
+                email,
+                criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+                criadoPor: this.user.email
+            });
+
+            await appSecundario.auth().signOut();
+            document.getElementById('form-usuario').reset();
+            this.mostrarNotificacao(`Acesso criado para ${nome}.`, 'success');
+        } catch (error) {
+            console.error('Erro ao criar usuário:', error);
+            this.mostrarNotificacao(this.mensagemErroAuth(error), 'error');
+        } finally {
+            await appSecundario.delete().catch(() => {});
+            btn.disabled = false;
+            btn.innerHTML = original;
+        }
+    }
+
+    mensagemErroAuth(error) {
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                return 'Já existe uma conta com esse e-mail. Se a pessoa deveria ter acesso, peça o UID dela no Console do Firebase.';
+            case 'auth/invalid-email':
+                return 'E-mail inválido.';
+            case 'auth/weak-password':
+                return 'Senha fraca: use pelo menos 6 caracteres.';
+            case 'auth/operation-not-allowed':
+                return 'Login por e-mail/senha está desativado no Console do Firebase.';
+            case 'permission-denied':
+                return 'Sem permissão para gerenciar usuários. Confira as regras do Firestore.';
+            default:
+                return 'Erro ao criar acesso: ' + (error.message || error.code);
+        }
+    }
+
+    async removerUsuario(uid, nome) {
+        if (!confirm(`Remover o acesso de ${nome}?\n\nA pessoa perde o painel imediatamente. A conta de login continua existindo no Firebase Authentication.`)) {
+            return;
+        }
+
+        try {
+            await db.collection('admins').doc(uid).delete();
+            this.mostrarNotificacao(`${nome} não tem mais acesso ao painel.`, 'success');
+        } catch (error) {
+            console.error('Erro ao remover usuário:', error);
+            this.mostrarNotificacao('Erro ao remover acesso: ' + error.message, 'error');
+        }
+    }
+
     // ===================== UTILITÁRIOS =====================
 
     escapar(valor) {
@@ -1248,8 +1452,42 @@ class VagasManager {
     }
 }
 
-// Inicializar o gerenciador
+// ===================== BOOTSTRAP =====================
+
 let vagasManager;
+
+// O painel so sobe depois de saber QUEM entrou. Antes disso nao se consulta o
+// Firestore: com as regras publicadas, uma leitura anonima seria recusada.
+async function iniciarPainel(user) {
+    const email = (user.email || '').toLowerCase();
+    const ehDono = email === EMAIL_DONO;
+    let autorizado = ehDono;
+
+    if (!autorizado) {
+        try {
+            const doc = await db.collection('admins').doc(user.uid).get();
+            autorizado = doc.exists;
+        } catch (erro) {
+            console.error('Erro ao verificar permissão:', erro);
+            autorizado = false;
+        }
+    }
+
+    if (!autorizado) {
+        await auth.signOut().catch(() => {});
+        window.location.href = './?erro=sem-acesso';
+        return;
+    }
+
+    vagasManager = new VagasManager(user, ehDono);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    vagasManager = new VagasManager();
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = './';
+            return;
+        }
+        if (!vagasManager) iniciarPainel(user);
+    });
 });

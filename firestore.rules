@@ -1,0 +1,66 @@
+rules_version = '2';
+
+// Regras de acesso ao Firestore.
+//
+// O painel esconde a aba de Usuarios de quem nao e o dono, mas isso e apenas
+// conveniencia visual: qualquer pessoa consegue burlar o que roda no navegador.
+// A autorizacao de verdade e aqui.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // O dono e o unico que pode criar e remover outros administradores.
+    // Trocar de dono = trocar este e-mail e publicar as regras de novo.
+    function ehDono() {
+      return request.auth != null
+          && request.auth.token.email.lower() == 'brunoeffore@outlook.com';
+    }
+
+    // Administrador = tem um documento em /admins com o proprio uid.
+    // O dono entra junto para que o sistema funcione mesmo com a colecao vazia
+    // (sem isso, ninguem conseguiria cadastrar o primeiro admin).
+    function ehAdmin() {
+      return ehDono()
+          || (request.auth != null
+              && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    // ---------------------------------------------------------------
+    // VAGAS
+    // O site publico consulta where('ativa', '==', true) sem estar logado,
+    // entao a leitura precisa continuar aberta para as vagas publicadas.
+    // Escrever, so administrador.
+    // ---------------------------------------------------------------
+    match /vagas/{vagaId} {
+      allow read: if resource.data.ativa == true || ehAdmin();
+      allow list: if ehAdmin();
+      allow create, update, delete: if ehAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // ADMINS
+    // Cada admin precisa conseguir ler o proprio documento, senao o painel
+    // nao consegue confirmar que ele tem acesso. Escrever, so o dono.
+    // ---------------------------------------------------------------
+    match /admins/{uid} {
+      allow get: if request.auth != null && (request.auth.uid == uid || ehAdmin());
+      allow list: if ehDono();
+      allow create, update, delete: if ehDono();
+    }
+
+    // ---------------------------------------------------------------
+    // EMAILS
+    // Gravados pela Cloud Function, que usa o Admin SDK e ignora estas regras.
+    // Nenhum cliente precisa escrever aqui.
+    // ---------------------------------------------------------------
+    match /emails/{emailId} {
+      allow read: if ehAdmin();
+      allow write: if false;
+    }
+
+    // Qualquer colecao nao listada acima fica fechada.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

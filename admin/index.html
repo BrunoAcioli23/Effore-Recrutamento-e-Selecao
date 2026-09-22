@@ -352,9 +352,6 @@
                 <img src="../assets/Logo-Agencia.png" alt="Imperio Recursos Humanos Logo">
             </div>
             
-            <h2 class="login-title">Acesso Administrativo</h2>
-            <p class="login-subtitle">Entre com suas credenciais para continuar</p>
-            
             <form id="admin-login-form" class="login-form">
                 <div class="input-group">
                     <label for="login-email">Email</label>
@@ -403,6 +400,26 @@
     </div>
 </main>
 
+<script>
+    // Quem chega aqui vindo do painel com ?erro=sem-acesso tinha login valido,
+    // mas nao esta autorizado a usar o admin.
+    document.addEventListener('DOMContentLoaded', () => {
+        if (new URLSearchParams(window.location.search).get('erro') === 'sem-acesso') {
+            const mostrar = () => {
+                if (window.showLoginError) {
+                    window.showLoginError('Esta conta não tem acesso ao painel. Fale com o administrador.');
+                } else {
+                    const el = document.getElementById('login-error-message');
+                    if (el) {
+                        el.textContent = 'Esta conta não tem acesso ao painel. Fale com o administrador.';
+                        el.style.display = 'block';
+                    }
+                }
+            };
+            setTimeout(mostrar, 0);
+        }
+    });
+</script>
 <script src="firebase-config.js"></script>
 <script src="firebase-auth.js"></script>
 
